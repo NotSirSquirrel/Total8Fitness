@@ -159,6 +159,9 @@ body.menu .tabs{transform:none}
 footer.bar{background:#0f150f}
 .tabs #tm{margin-top:auto;background:var(--bg)}
 #wom{padding-bottom:28px}
+#lkm{display:flex;gap:6px;padding:4px;background:var(--sv);border-radius:18px;box-shadow:inset 0 0 0 1px #00000010}
+#lkm button{flex:1;padding:11px;border-radius:14px;font-weight:600;color:var(--mut);transition:.25s}
+#lkm button.on{background:var(--p);color:var(--onp);box-shadow:0 6px 16px #b6e24c55}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
@@ -173,8 +176,7 @@ footer.bar{background:#0f150f}
 <nav class="tabs" aria-label="Menu"><div class="dh">Menu</div>
 <button id="t1" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>Timer</button>
 <button id="t2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-2-3-7-2-7 3 0 5 3 10 7 10s7-5 7-10c0-5-5-6-7-3zM12 7c0-2 1-3 3-4"/></svg>Calories</button>
-<button id="t3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>Workouts</button>
-<button id="tm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>Appearance</button></nav>
+<button id="t3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>Workouts</button></nav>
 <main class="cv" id="cal">
   <div class="dn"><button class="ib" id="dp" aria-label="Previous day" style="font-size:26px">‹</button><span id="dl"></span><button class="ib" id="dx" aria-label="Next day" style="font-size:26px">›</button></div>
   <div class="card" id="sum"></div>
@@ -254,7 +256,7 @@ footer.bar{background:#0f150f}
   <header><button class="ib" id="sback" aria-label="Back"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1>Settings</h1></header>
   <h2>APPEARANCE</h2>
   <div class="f"><label>Color way</label><div id="sw" style="display:flex;gap:12px;flex-wrap:wrap;padding:4px 0"></div></div>
-  <div class="f"><label>Mode</label><select data-k="look"><option value="auto">Auto (match phone)</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+  <div class="f"><label>Mode</label><div id="lkm"><button data-look="auto">Auto</button><button data-look="light">Light</button><button data-look="dark">Dark</button></div></div>
   <h2>THIS PHONE</h2>
   <div class="f"><label>Role</label><select data-k="mode"><option value="single">Single phone (start + finish)</option><option value="start">Start phone (countdown, reaction time)</option><option value="finish">Finish phone (detects the line)</option></select></div>
   <div class="f"><label>Pair code (same on both phones, two-phone modes)</label><input data-k="code" type="text" maxlength="12" placeholder="e.g. 4821"></div>
@@ -1065,8 +1067,8 @@ $('pcard').onclick=e=>{if(e.target.closest('[data-p]'))openPf();};
 
 // ----- menu drawer (hamburger)
 (()=>{const b=document.createElement('button');b.className='ib';b.id='mb';b.setAttribute('aria-label','Menu');b.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>';document.querySelector('header').prepend(b);const m=o=>document.body.classList.toggle('menu',o);b.onclick=()=>m(true);$('scrim').onclick=()=>m(false);['t1','t2','t3'].forEach(i=>$(i).addEventListener('click',()=>m(false)));document.addEventListener('keydown',e=>{if(e.key==='Escape')m(false);});
-  const tmb=$('tm'),up=()=>{tmb.lastChild.textContent='Appearance: '+({auto:'Auto',light:'Light',dark:'Dark'}[cfg.look||'auto']);};up();
-  tmb.onclick=()=>{cfg.look={auto:'light',light:'dark',dark:'auto'}[cfg.look||'auto'];ls.s('cfg',cfg);applyTheme();try{applyCfg();}catch(e){}up();};})();
+  const lm=()=>document.querySelectorAll('#lkm button').forEach(b=>b.classList.toggle('on',b.dataset.look===(cfg.look||'auto')));lm();
+  $('lkm').onclick=e=>{const b=e.target.closest('[data-look]');if(!b)return;cfg.look=b.dataset.look;ls.s('cfg',cfg);applyTheme();lm();};})();
 
 // ----- Strava sync (encrypted file written by the GitHub Action)
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),SF='data/workouts.enc';
