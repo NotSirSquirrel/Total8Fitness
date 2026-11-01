@@ -115,6 +115,8 @@ header h1{font-weight:700;font-size:24px;letter-spacing:-.02em}
 .sheet{animation:up .3s cubic-bezier(.2,.8,.2,1)}@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 #toast{border-radius:99px;padding:12px 18px}
 .sp:active{transform:scale(.98)}
+body.wo #cal{display:none!important}body:not(.wo) #wom{display:none!important}
+#wom .vb .btn{margin:0 12px 0 12px;flex:1}#wom .vb{gap:0;flex-wrap:nowrap}
 </style>
 </head>
 <body>
@@ -124,7 +126,7 @@ header h1{font-weight:700;font-size:24px;letter-spacing:-.02em}
   <label class="tg"><input type="checkbox" id="camTg" aria-label="Camera"><i></i><b><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3zm3 14a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg></b></label>
   <button class="ib" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.9 2h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.6.22L2.69 8.47a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.12.22.37.29.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.49 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z"/></svg></button>
 </header>
-<nav class="tabs"><button id="t1" class="on">⏱ Timer</button><button id="t2">🍎 Calories</button></nav>
+<nav class="tabs"><button id="t1" class="on">⏱ Timer</button><button id="t2">🍎 Calories</button><button id="t3">💪 Workouts</button></nav>
 <main class="cv" id="cal">
   <div class="dn"><button class="ib" id="dp" aria-label="Previous day" style="font-size:26px">‹</button><span id="dl"></span><button class="ib" id="dx" aria-label="Next day" style="font-size:26px">›</button></div>
   <div class="card" id="sum"></div>
@@ -132,12 +134,29 @@ header h1{font-weight:700;font-size:24px;letter-spacing:-.02em}
   <div id="meals"></div>
   <div class="card" id="wk"></div>
 </main>
+<div class="sheet hide" id="lk" style="display:flex;flex-direction:column;justify-content:center;padding:28px">
+  <div style="font-size:46px">🔒</div><h1 style="font-size:30px;margin:8px 0 6px">Welcome back</h1>
+  <div class="mut" style="margin-bottom:18px">Your synced workouts are encrypted. Enter your passphrase to unlock them.</div>
+  <input class="in" id="lkp" type="password" placeholder="Passphrase" autocomplete="current-password">
+  <label style="display:flex;gap:8px;align-items:center;margin:12px 0"><input id="lkr" type="checkbox" checked> Remember on this device</label>
+  <div id="lke" class="mut" style="min-height:22px"></div>
+  <button class="btn" id="lku" style="margin:8px 0">Unlock</button>
+  <button class="btn2" id="lks" style="align-self:center;margin-top:8px">Continue without synced data</button>
+</div>
+<main class="cv" id="wom">
+  <div class="vb" style="margin:0 0 10px"><label class="btn" style="display:inline-block;text-align:center">⬆ Import Garmin / Coros<input id="wfi" type="file" multiple accept=".csv,.tcx,.gpx,.fit,.txt" class="hide"></label><button class="btn" id="wadd" style="background:var(--sv);color:var(--on)">+ Add workout</button></div>
+  <div id="wsr" class="hide" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">↻ Sync Strava</button><button class="btn2" id="wlk">Lock</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
+  <div id="wfm" class="hide card"><div class="g2"><select class="in" id="w_t"><option>Run</option><option>Walk</option><option>Cycle</option><option>Swim</option><option>Hike</option><option>Strength</option><option>Other</option></select><input class="in" id="w_d" type="date"></div><input class="in" id="w_n" placeholder="Title (optional)" style="margin-top:6px"><div class="g2"><div><label class="mut" id="w_ml" style="font-size:12px">Distance (km)</label><input class="in" id="w_m" type="number" inputmode="decimal"></div><div><label class="mut" style="font-size:12px">Minutes</label><input class="in" id="w_s" type="number" inputmode="decimal"></div></div><div class="g2"><div><label class="mut" style="font-size:12px">Calories (blank = estimate)</label><input class="in" id="w_k" type="number" inputmode="numeric"></div><div><label class="mut" style="font-size:12px">Avg heart rate</label><input class="in" id="w_h" type="number" inputmode="numeric"></div></div><button class="btn" id="w_sv" style="margin:10px 0 0">Save workout</button></div>
+  <div class="card" id="wst"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
+  <div class="hd">History</div><div id="wlist"></div>
+</main>
 <div class="sheet hide" id="pf">
   <header><button class="ib" id="pfb" aria-label="Back"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1>Your plan</h1></header>
   <div class="f"><label>Units</label><select id="q_u"><option value="m">Metric (kg, cm)</option><option value="i">Imperial (lb, in)</option></select></div>
   <div class="f"><label>Sex</label><select id="q_x"><option value="m">Male</option><option value="f">Female</option></select></div>
   <div class="f"><label>Age</label><input id="q_a" type="number" inputmode="numeric" placeholder="25"></div>
   <div class="f"><label id="q_hl">Height (cm)</label><input id="q_h" type="number" inputmode="decimal"></div>
+  <div class="f hide" id="q_fi"><label>Height</label><div class="g2"><input id="q_ft" type="number" inputmode="numeric" placeholder="ft"><input id="q_in" type="number" inputmode="numeric" placeholder="in"></div></div>
   <div class="f"><label id="q_wl">Weight (kg)</label><input id="q_w" type="number" inputmode="decimal"></div>
   <div class="f"><label id="q_gl">Goal weight (kg)</label><input id="q_g" type="number" inputmode="decimal"></div>
   <div class="f"><label>Activity level</label><select id="q_v"><option value="0">Sedentary (little exercise)</option><option value="1">Light (1–3 workouts/week)</option><option value="2" selected>Moderate (3–5 workouts/week)</option><option value="3">Very active (6–7 workouts/week)</option><option value="4">Athlete (twice a day)</option></select></div>
@@ -835,11 +854,11 @@ const tot=k=>(L[k]||[]).reduce((a,e)=>{a.k+=e.k;a.p+=e.p;a.c+=e.c;a.f+=e.f;retur
 const ni='class="in" type="number" inputmode="decimal"';
 
 function render(){
-  const k=dk(day),t=tot(k),left=G.k-t.k,over=left<0,w=W[k]||0;
+  const k=dk(day),t=tot(k),left=G.k-t.k+burned(k),over=left<0,w=W[k]||0;
   $('dl').textContent=k===dk(new Date())?'Today':day.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
   const mac=[['Protein',t.p,G.p],['Carbs',t.c,G.c],['Fat',t.f,G.f]].map(m=>'<div style="margin-bottom:6px;font-size:13px"><div style="display:flex;justify-content:space-between"><span>'+m[0]+'</span><span>'+Math.round(m[1])+' / '+m[2]+' g</span></div><div class="bb"><i style="width:'+Math.min(100,m[1]/m[2]*100||0)+'%"></i></div></div>').join('');
-  $('sum').innerHTML='<div style="display:flex;align-items:center;gap:14px"><svg viewBox="0 0 120 120" width="118" height="118" style="flex:none"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--ol)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="'+(over?'var(--red)':'var(--p)')+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+C*(1-Math.min(1,t.k/G.k))+'" transform="rotate(-90 60 60)"/><text x="60" y="60" text-anchor="middle" font-size="24" font-weight="600" fill="currentColor">'+Math.abs(Math.round(left))+'</text><text x="60" y="78" text-anchor="middle" font-size="11" fill="var(--mut)">kcal '+(over?'over':'left')+'</text></svg><div style="flex:1">'+mac+'</div></div>'+
-  '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+Math.round(t.k)+' of '+G.k+' kcal</span><button class="btn2" data-a="goal">Goals</button></div>'+
+  $('sum').innerHTML='<div style="display:flex;align-items:center;gap:14px"><svg viewBox="0 0 120 120" width="118" height="118" style="flex:none"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--ol)" stroke-width="10"/><circle cx="60" cy="60" r="52" fill="none" stroke="'+(over?'var(--red)':'var(--p)')+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+C*(1-Math.max(0,Math.min(1,(t.k-burned(k))/G.k)))+'" transform="rotate(-90 60 60)"/><text x="60" y="60" text-anchor="middle" font-size="24" font-weight="600" fill="currentColor">'+Math.abs(Math.round(left))+'</text><text x="60" y="78" text-anchor="middle" font-size="11" fill="var(--mut)">kcal '+(over?'over':'left')+'</text></svg><div style="flex:1">'+mac+'</div></div>'+
+  '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span>'+Math.round(t.k)+' of '+G.k+' kcal'+(burned(k)?' · '+Math.round(burned(k))+' burned':'')+'</span><button class="btn2" data-a="goal">Goals</button></div>'+
   '<div id="gf" class="hide"><div class="g2"><input '+ni+' id="g0" value="'+G.k+'" placeholder="Calories"><input '+ni+' id="g1" value="'+G.p+'" placeholder="Protein g"><input '+ni+' id="g2" value="'+G.c+'" placeholder="Carbs g"><input '+ni+' id="g3" value="'+G.f+'" placeholder="Fat g"></div><button class="btn2" data-a="gs" style="margin-top:8px;background:var(--p);color:var(--onp)">Save goals</button></div>'+
   '<div style="display:flex;align-items:center;gap:8px;margin-top:10px">💧 <span style="flex:1">Water: '+w*250+' ml ('+w+' glasses)</span><button class="btn2" data-a="w" data-d="-1">−</button><button class="btn2" data-a="w" data-d="1">+</button></div>';
   $('meals').innerHTML=M.map(m=>{const es=(L[k]||[]).map((e,i)=>[e,i]).filter(x=>x[0].m===m),mk=es.reduce((a,x)=>a+x[0].k,0);
@@ -857,8 +876,8 @@ $('cal').onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b
   else if(a==='w'){W[k]=Math.max(0,(W[k]||0)+ +b.dataset.d);sv();render();}};
 $('dp').onclick=()=>{day.setDate(day.getDate()-1);render();};
 $('dx').onclick=()=>{day.setDate(day.getDate()+1);render();};
-function tab(c){document.body.classList.toggle('cal',c);$('t1').classList.toggle('on',!c);$('t2').classList.toggle('on',c);document.querySelector('header h1').textContent=c?'Calorie Tracker':'Track Workout';if(c)render();}
-$('t1').onclick=()=>tab(false);$('t2').onclick=()=>tab(true);
+function tab(n){document.body.classList.toggle('cal',n>0);document.body.classList.toggle('wo',n===2);['t1','t2','t3'].forEach((id,i)=>$(id).classList.toggle('on',i===n));document.querySelector('header h1').textContent=['Track Workout','Calorie Tracker','Workouts'][n];if(n===1)render();if(n===2)wrender();}
+$('t1').onclick=()=>tab(0);$('t2').onclick=()=>tab(1);$('t3').onclick=()=>tab(2);
 
 // ----- add food
 function openAdd(m){$('fm').value=m||'Snacks';$('fs').classList.remove('hide');back2list();list();}
@@ -873,7 +892,7 @@ $('fsq').oninput=()=>list();
 $('fl').onclick=e=>{const r=e.target.closest('[data-i]');if(r)pick(shown[+r.dataset.i]);};
 $('fback').onclick=()=>{if(!$('fq').classList.contains('hide'))return back2list();stopScan();pend='';$('fs').classList.add('hide');};
 const qv=()=>Math.max(.05,+$('qn').value||1);
-function qt(){const q=qv(),f=sel;$('qt').innerHTML='<b style="font-size:22px">'+Math.round(f.k*q)+' kcal</b><div class="mut">Protein '+r1(f.p*q)+' g · Carbs '+r1(f.c*q)+' g · Fat '+r1(f.f*q)+' g</div>';}
+function qt(){const q=qv(),f=sel;$('qt').innerHTML='<b style="font-size:22px">'+Math.round(f.k*q)+' kcal</b><div class="mut">Protein '+r1(f.p*q)+' g · Carbs '+r1(f.c*q)+' g · Fat '+r1(f.f*q)+' g</div>'+(f.x?'<div class="mut">Fiber '+r1(f.x.fi*q)+' g · Sugar '+r1(f.x.su*q)+' g · Sodium '+Math.round(f.x.na*q)+' mg</div>':'');}
 function pick(f){sel=f;stopScan();$('fmain').classList.add('hide');$('fq').classList.remove('hide');
   $('fq').innerHTML='<b style="font-size:19px">'+esc(f.n)+'</b><div class="mut">per '+esc(f.s)+'</div><div class="f" style="padding:10px 0"><label>Servings</label><input class="in" id="qn" type="number" min="0.25" step="0.25" value="1" inputmode="decimal"></div><div id="qt"></div><div class="vb"><button class="btn" data-q="ok">Add to log</button><button class="btn" data-q="no" style="background:var(--sv);color:var(--on)">Cancel</button></div>';qt();}
 $('fq').oninput=qt;
@@ -887,7 +906,13 @@ $('cs').onclick=()=>{const g=i=>$(i).value,n=g('cn').trim();if(!n)return toast('
 
 // ----- barcode
 function stopScan(){clearInterval(tm);if(bs)bs.getTracks().forEach(t=>t.stop());bs=null;$('fcam').classList.add('hide');}
-function code(c){stopScan();const f=BC[c];if(f){toast('Found '+f.n);pick(f);}else{pend=c;list();toast('New barcode. Pick the food it belongs to.');}}
+async function lookup(c){try{const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(c)+'.json?fields=product_name,brands,serving_size,nutriments',{signal:AbortSignal.timeout(8000)});if(!r.ok)return null;const j=await r.json();if(j.status!==1||!j.product)return null;
+  const p=j.product,n=p.nutriments||{},sv=n['energy-kcal_serving']!=null,x=sv?'_serving':'_100g',g=k=>+n[k+x]||0,name=((p.brands?p.brands.split(',')[0]+' ':'')+(p.product_name||'')).trim();if(!name)return null;
+  return{n:name,s:sv?(p.serving_size||'1 serving'):'100 g',k:+n['energy-kcal'+x]||(+n['energy'+x]/4.184)||0,p:g('proteins'),c:g('carbohydrates'),f:g('fat'),x:{fi:g('fiber'),su:g('sugars'),na:g('sodium')*1000}};}catch(e){return null;}}
+async function code(c){stopScan();const f=BC[c];if(f){toast('Found '+f.n);return pick(f);}
+  $('fst').textContent='Looking up '+c+'…';const o=await lookup(c);
+  if(o){pend=c;toast('Found '+o.n);return pick(o);}
+  pend=c;list();toast('Not found online. Pick the food it belongs to.');}
 async function live(){
   if(!('BarcodeDetector' in window)||!navigator.mediaDevices)return false;
   try{bs=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});const v=$('bv');v.srcObject=bs;await v.play();const d=new BarcodeDetector();
@@ -907,12 +932,47 @@ $('fi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)ret
   if(mode==='ai')return ai(f);
   try{code(await dec(f));}catch(x){toast('Couldn’t read that barcode. Try a closer, sharper photo or type the number.');}};
 
+// ----- workouts database (Garmin / Coros import)
+let WO=ls.g('calWo',[]);
+const burned=k=>WO.reduce((a,w)=>w.d===k?a+w.k:a,0),IW={Run:'🏃',Walk:'🚶',Cycle:'🚴',Swim:'🏊',Hike:'🥾',Strength:'🏋️',Other:'⚡'};
+const ty=s=>{s=String(s||'').toLowerCase();return /run|jog|treadmill/.test(s)?'Run':/walk/.test(s)?'Walk':/cycl|bik|ride/.test(s)?'Cycle':/swim/.test(s)?'Swim':/hik/.test(s)?'Hike':/strength|weight|gym|cross|hiit/.test(s)?'Strength':'Other';};
+const pd=x=>{x=String(x||'').trim();if(/^\d{4}-\d\d-\d\d \d/.test(x))x=x.replace(' ','T');const d=new Date(x);return isNaN(d)?null:d;};
+const nu=x=>parseFloat(String(x||'').replace(/,/g,''))||0;
+const tsec=x=>{x=String(x||'').trim();return x.includes(':')?x.split(':').reduce((a,v)=>a*60+(+v||0),0):+x||0;};
+function fillFt(cm){const t=Math.round(cm/2.54);$q('ft').value=Math.floor(t/12);$q('in').value=t%12;}
+function est(o){const w=P?P.w:70;if(o.t==='Run'&&o.m)return Math.round(w*o.m/1000*1.036);return Math.round(({Walk:3.8,Cycle:7.5,Swim:7,Hike:6,Strength:5,Run:9.8}[o.t]||5)*w*o.s/3600);}
+function csvRows(t){const rows=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++;}else q=false;}else c+=ch;}else if(ch==='"')q=true;else if(ch===','){r.push(c);c='';}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';if(r.length>1||r[0])rows.push(r);r=[];}else c+=ch;}r.push(c);if(r.length>1||r[0])rows.push(r);return rows;}
+function pcsv(t){const R=csvRows(t.replace(/^\uFEFF/,''));if(R.length<2)return[];const H=R[0].map(h=>h.trim().toLowerCase()),fi=re=>H.findIndex(h=>re.test(h)),iT=fi(/activity type|sport|^type/),iD=fi(/^date|start time|begin/),iN=fi(/title|name/),iM=fi(/distance/),iS=fi(/^time$|duration|elapsed/),iK=fi(/calor/),iH=fi(/avg.*(hr|heart)|average.*heart/),u=iM<0?1:/\(m\)|meter/.test(H[iM])?1:/mi/.test(H[iM])?1609.344:1000;
+  return R.slice(1).map(r=>{const d=pd(r[iD]);return d&&{d:dk(d),t:ty(r[iT]),n:(r[iN]||r[iT]||'Workout').trim(),m:nu(r[iM])*u,s:tsec(r[iS]),k:nu(r[iK]),h:nu(r[iH])};}).filter(Boolean);}
+function ptcx(t){const x=new DOMParser().parseFromString(t,'text/xml'),out=[];x.querySelectorAll('Activity').forEach(a=>{let m=0,s=0,k=0,hs=0,hn=0;a.querySelectorAll('Lap').forEach(l=>{const g=n=>+(l.querySelector(n)?.textContent)||0;m+=g('DistanceMeters');s+=g('TotalTimeSeconds');k+=g('Calories');const h=l.querySelector('AverageHeartRateBpm Value');if(h){hs+=+h.textContent;hn++;}});const d=pd(a.querySelector('Id')?.textContent);if(d)out.push({d:dk(d),t:ty(a.getAttribute('Sport')),n:a.getAttribute('Sport')||'Workout',m,s,k,h:hn?hs/hn:0});});return out;}
+function pgpx(t){const x=new DOMParser().parseFromString(t,'text/xml'),out=[];x.querySelectorAll('trk').forEach(tk=>{const pts=[...tk.querySelectorAll('trkpt')];if(pts.length<2)return;let m=0,hs=0,hn=0;const Q=pts.map(p=>({la:+p.getAttribute('lat'),lo:+p.getAttribute('lon'),t:pd(p.querySelector('time')?.textContent)}));
+  for(let i=1;i<Q.length;i++){const a=Q[i-1],b=Q[i],r=Math.PI/180,dl=(b.la-a.la)*r,dn=(b.lo-a.lo)*r,h=Math.sin(dl/2)**2+Math.cos(a.la*r)*Math.cos(b.la*r)*Math.sin(dn/2)**2;m+=2*6371000*Math.asin(Math.sqrt(h));}
+  pts.forEach(p=>{const e=p.getElementsByTagNameNS('*','hr')[0];if(e){hs+=+e.textContent;hn++;}});const t0=Q[0].t,t1=Q[Q.length-1].t;if(!t0)return;const nm=tk.querySelector('name')?.textContent||'Workout';out.push({d:dk(t0),t:ty((tk.querySelector('type')?.textContent||'')+' '+nm),n:nm,m,s:t1?(t1-t0)/1000:0,k:0,h:hn?hs/hn:0});});return out;}
+function addW(a){let n=0;a.forEach(r=>{const o={id:Date.now()*1000+Math.floor(Math.random()*1000),d:r.d,t:r.t||'Other',n:r.n||r.t,m:Math.round(r.m)||0,s:Math.round(r.s)||0,k:Math.round(r.k)||0,h:Math.round(r.h)||0};if(!o.s&&!o.m)return;if(!o.k)o.k=est(o);if(WO.some(w=>w.d===o.d&&w.t===o.t&&Math.abs(w.s-o.s)<5&&Math.abs(w.m-o.m)<20))return;WO.push(o);n++;});WO.sort((a,b)=>b.d.localeCompare(a.d));ls.s('calWo',WO);return n;}
+function wrender(){
+  const du=P&&P.u==='i'?[1609.344,'mi']:[1000,'km'],fd=m=>r1(m/du[0])+' '+du[1],fh=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m';},pc=(s,m)=>{const p=Math.round(s/(m/du[0]));return Math.floor(p/60)+':'+String(p%60).padStart(2,'0')+' /'+du[1];},S=k=>WO.reduce((a,w)=>a+w[k],0);
+  $('w_ml').textContent='Distance ('+du[1]+')';
+  $('wst').innerHTML='<b>All time</b><div class="g2" style="margin-top:8px">'+[[WO.length,'Workouts'],[fd(S('m')),'Distance'],[fh(S('s')),'Time'],[Math.round(S('k')).toLocaleString(),'kcal burned']].map(x=>'<div><div style="font-size:24px;font-weight:700">'+x[0]+'</div><div class="mut">'+x[1]+'</div></div>').join('')+'</div>';
+  $('wty').innerHTML='<b>By activity</b>'+(Object.keys(IW).map(t=>{const a=WO.filter(w=>w.t===t);if(!a.length)return '';const m=a.reduce((s,w)=>s+w.m,0),s=a.reduce((x,w)=>x+w.s,0);return '<div style="display:flex;justify-content:space-between;padding:7px 0"><span>'+IW[t]+' '+t+' · '+a.length+'</span><span class="mut">'+(m?fd(m)+' · ':'')+fh(s)+(m&&/Run|Walk|Hike/.test(t)?' · '+pc(s,m):'')+'</span></div>';}).join('')||'<div class="mut" style="margin-top:6px">Nothing yet. Import a Garmin or Coros export, or add a workout.</div>');
+  const cw=new Date();cw.setDate(cw.getDate()-((cw.getDay()+6)%7));const bars=[];for(let i=7;i>=0;i--){const a=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()-i*7),b=new Date(a.getFullYear(),a.getMonth(),a.getDate()+7),ka=dk(a),kb=dk(b);bars.push([a,WO.filter(w=>w.d>=ka&&w.d<kb).reduce((s,w)=>s+w.k,0)]);}
+  const mx=Math.max(1,...bars.map(b=>b[1]));
+  $('wch').innerHTML='<b>Calories burned per week</b><div style="display:flex;align-items:flex-end;gap:6px;margin-top:10px">'+bars.map(b=>'<div style="flex:1;text-align:center;font-size:10px"><div class="mut">'+(b[1]?Math.round(b[1]):'')+'</div><div style="height:'+Math.max(3,b[1]/mx*60)+'px;background:var(--p);border-radius:6px;margin:2px 0"></div>'+(b[0].getMonth()+1)+'/'+b[0].getDate()+'</div>').join('')+'</div>';
+  const top=(f,g)=>{const b=WO.reduce((x,w)=>(!x||f(w)>f(x))?w:x,null);return b&&f(b)>0?g(b)+' <span class="mut">'+b.d+'</span>':'–';},fr=WO.filter(w=>w.t==='Run'&&w.m>=1000).sort((a,b)=>a.s/a.m-b.s/b.m)[0];
+  $('wpr').innerHTML='<b>Personal bests</b>'+[['Longest distance',top(w=>w.m,w=>fd(w.m))],['Longest workout',top(w=>w.s,w=>fh(w.s))],['Most calories',top(w=>w.k,w=>w.k+' kcal')],['Fastest run pace',fr?pc(fr.s,fr.m)+' <span class="mut">'+fr.d+'</span>':'–']].map(x=>'<div style="display:flex;justify-content:space-between;padding:7px 0"><span>'+x[0]+'</span><span>'+x[1]+'</span></div>').join('');
+  $('wlist').innerHTML=WO.slice(0,100).map(w=>'<div class="sp"><div style="font-size:26px">'+IW[w.t]+'</div><div class="sm"><div>'+esc(w.n)+'</div><div class="mut">'+w.d+(w.m?' · '+fd(w.m):'')+' · '+fh(w.s)+(w.m&&/Run|Walk|Hike/.test(w.t)?' · '+pc(w.s,w.m):'')+(w.h?' · '+w.h+' bpm':'')+'</div></div><b style="font-size:17px">'+w.k+' kcal</b><button class="ib" data-w="'+w.id+'" aria-label="Delete">✕</button></div>').join('');
+}
+$('wlist').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;WO=WO.filter(w=>String(w.id)!==b.dataset.w);ls.s('calWo',WO);wrender();};
+$('wfi').onchange=async e=>{let n=0,fit=0;for(const f of e.target.files){const fn=f.name.toLowerCase();if(fn.endsWith('.fit')){fit++;continue;}try{const tx=await f.text();n+=addW(fn.endsWith('.tcx')?ptcx(tx):fn.endsWith('.gpx')?pgpx(tx):pcsv(tx));}catch(x){}}e.target.value='';wrender();toast(n?'Imported '+n+' workout'+(n>1?'s':''):fit?'FIT files can’t be read yet. Export CSV, TCX or GPX instead.':'No new workouts found in that file.');};
+$('wadd').onclick=()=>{$('w_d').value=dk(new Date());$('wfm').classList.toggle('hide');};
+$('w_sv').onclick=()=>{const u=P&&P.u==='i'?1609.344:1000,t=$('w_t').value,s=(+$('w_s').value||0)*60,m=(+$('w_m').value||0)*u;if(!s&&!m)return toast('Enter a distance or minutes.');
+  addW([{d:$('w_d').value||dk(new Date()),t,n:$('w_n').value.trim()||t,m,s,k:+$('w_k').value||0,h:+$('w_h').value||0}]);['w_n','w_m','w_s','w_k','w_h'].forEach(i=>$(i).value='');$('wfm').classList.add('hide');wrender();toast('Workout saved');};
+
 // ----- your plan (Mifflin-St Jeor)
 const AC=[1.2,1.375,1.55,1.725,1.9];let P=ls.g('calProf',null),lu='m';
 const $q=i=>$('q_'+i),KG=.45359237;
-function lab(){const i=$q('u').value==='i';$('q_hl').textContent='Height ('+(i?'in':'cm')+')';$('q_wl').textContent='Weight ('+(i?'lb':'kg')+')';$('q_gl').textContent='Goal weight ('+(i?'lb':'kg')+')';}
+function lab(){const i=$q('u').value==='i';$('q_h').parentNode.classList.toggle('hide',i);$('q_fi').classList.toggle('hide',!i);$('q_wl').textContent='Weight ('+(i?'lb':'kg')+')';$('q_gl').textContent='Goal weight ('+(i?'lb':'kg')+')';}
 function calc(){
-  const i=$q('u').value==='i',kw=i?KG:1,w=(+$q('w').value||0)*kw,h=(+$q('h').value||0)*(i?2.54:1),a=+$q('a').value||0,g=(+$q('g').value||0)*kw||w,m=$q('x').value==='m';
+  const i=$q('u').value==='i',kw=i?KG:1,w=(+$q('w').value||0)*kw,h=i?((+$q('ft').value||0)*12+(+$q('in').value||0))*2.54:(+$q('h').value||0),a=+$q('a').value||0,g=(+$q('g').value||0)*kw||w,m=$q('x').value==='m';
   if(!w||!h||!a){$('q_r').innerHTML='<div class="mut" style="text-align:center">Fill in your age, height and weight to see your daily target.</div>';return null;}
   const td=(10*w+6.25*h-5*a+(m?5:-161))*AC[+$q('v').value],pace=+$q('p').value,dir=Math.abs(g-w)<.5?0:Math.sign(g-w);
   const t=Math.round(Math.max(m?1500:1200,td+dir*pace*1100)/10)*10,p=Math.round(Math.min(1.8*w,t*.35/4)),f=Math.round(t*.25/9),c=Math.max(0,Math.round((t-p*4-f*9)/4)),wk=dir?Math.ceil(Math.abs(g-w)/pace):0,dt=new Date();dt.setDate(dt.getDate()+wk*7);
@@ -921,10 +981,10 @@ function calc(){
 }
 function openPf(){
   const i=P&&P.u==='i';lu=P?P.u:'m';$q('u').value=lu;
-  if(P){$q('x').value=P.x;$q('a').value=P.a;$q('h').value=r1(P.h/(i?2.54:1));$q('w').value=r1(P.w/(i?KG:1));$q('g').value=r1(P.g/(i?KG:1));$q('v').value=P.v;$q('p').value=P.p;}
+  if(P){$q('x').value=P.x;$q('a').value=P.a;$q('h').value=r1(P.h);fillFt(P.h);$q('w').value=r1(P.w/(i?KG:1));$q('g').value=r1(P.g/(i?KG:1));$q('v').value=P.v;$q('p').value=P.p;}
   lab();calc();$('pf').classList.remove('hide');
 }
-$q('u').onchange=()=>{const n=$q('u').value,i=n==='i';if(n!==lu){[['w',i?1/KG:KG],['g',i?1/KG:KG],['h',i?1/2.54:2.54]].forEach(([k,x])=>{const v=+$q(k).value;if(v)$q(k).value=r1(v*x);});lu=n;}lab();calc();};
+$q('u').onchange=()=>{const n=$q('u').value,i=n==='i';if(n!==lu){[['w',i?1/KG:KG],['g',i?1/KG:KG]].forEach(([k,x])=>{const v=+$q(k).value;if(v)$q(k).value=r1(v*x);});if(i){const c=+$q('h').value;if(c)fillFt(c);}else{const c=((+$q('ft').value||0)*12+(+$q('in').value||0))*2.54;if(c)$q('h').value=r1(c);}lu=n;}lab();calc();};
 $('pf').oninput=calc;$('pfb').onclick=()=>$('pf').classList.add('hide');
 $('q_ap').onclick=()=>{const r=calc();if(!r)return toast('Fill in your age, height and weight first.');
   P={u:$q('u').value,x:$q('x').value,a:r.a,h:r.h,w:r.w,g:r.g,v:+$q('v').value,p:+$q('p').value,s0:P&&Math.abs(P.g-r.g)<.01?P.s0:r.w};
@@ -936,6 +996,26 @@ function prof(){
   el.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center"><div><div class="mut">Weight</div><b style="font-size:24px">'+r1(P.w/kw)+u+'</b> <span class="mut">→ goal '+r1(P.g/kw)+u+'</span></div><button class="btn2" data-p="1">Edit plan</button></div><div class="bb" style="margin-top:12px"><i style="width:'+pr*100+'%"></i></div>';
 }
 $('pcard').onclick=e=>{if(e.target.closest('[data-p]'))openPf();};
+
+// ----- Strava sync (encrypted file written by the GitHub Action)
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),SF='data/workouts.enc';
+let sfile=null,skey=null;
+async function getFile(){try{const r=await fetch(SF+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)return null;const f=await r.json();return f&&f.ct?f:null;}catch(e){return null;}}
+async function dkey(pass,f){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(f.salt),iterations:600000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['decrypt']);}
+async function openF(key,f){return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(f.iv)},key,b64(f.ct))));}
+function syncIn(list){let n=0;const ids=new Set(WO.map(w=>w.sid).filter(Boolean));
+  list.forEach(a=>{const o={id:a.sid,sid:a.sid,d:a.d,t:a.t,n:a.n,m:Math.round(a.m),s:a.s,k:Math.round(a.k),h:Math.round(a.h)};if(!o.d||(!o.s&&!o.m))return;if(!o.k)o.k=est(o);
+    if(ids.has(a.sid)){WO=WO.map(w=>w.sid===a.sid?o:w);return;}
+    if(WO.some(w=>!w.sid&&w.d===o.d&&w.t===o.t&&Math.abs(w.s-o.s)<5&&Math.abs(w.m-o.m)<20))return;WO.push(o);n++;});
+  WO.sort((a,b)=>b.d.localeCompare(a.d));ls.s('calWo',WO);return n;}
+async function loadSync(key,f){const d=await openF(key,f),n=syncIn(Object.values(d.acts||{}));skey=key;$('wsr').classList.remove('hide');$('wsy').textContent='Synced '+(d.updated?new Date(d.updated).toLocaleString():'')+' · '+Object.keys(d.acts||{}).length+' activities';render();wrender();return n;}
+async function unlock(pass,remember){const key=await dkey(pass,sfile),n=await loadSync(key,sfile);if(remember)ls.s('calKey',{salt:sfile.salt,k:btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey('raw',key))))});return n;}
+$('lku').onclick=async()=>{const p=$('lkp').value;if(!p)return;$('lke').textContent='Unlocking…';try{const n=await unlock(p,$('lkr').checked);$('lk').classList.add('hide');$('lkp').value='';$('lke').textContent='';toast(n?'Imported '+n+' workouts from Strava':'Unlocked');}catch(e){$('lke').textContent='That passphrase didn’t work.';}};
+$('lkp').onkeydown=e=>{if(e.key==='Enter')$('lku').click();};
+$('lks').onclick=()=>$('lk').classList.add('hide');
+$('wsb').onclick=async()=>{const f=await getFile();if(!f)return toast('Couldn’t reach the sync file.');sfile=f;if(skey){try{const n=await loadSync(skey,f);return toast(n?'Imported '+n+' new workouts':'Already up to date');}catch(e){}}$('lk').classList.remove('hide');};
+$('wlk').onclick=()=>{ls.s('calKey',null);skey=null;WO=WO.filter(w=>!w.sid);ls.s('calWo',WO);$('wsr').classList.add('hide');wrender();render();$('lk').classList.remove('hide');};
+(async()=>{sfile=await getFile();if(!sfile||!window.crypto||!crypto.subtle)return;const ck=ls.g('calKey',null);if(ck&&ck.salt===sfile.salt){try{await loadSync(await crypto.subtle.importKey('raw',b64(ck.k),'AES-GCM',false,['decrypt']),sfile);return;}catch(e){}}$('lk').classList.remove('hide');})();
 
 // ----- scan food with Claude
 async function ai(file){
