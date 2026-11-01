@@ -117,7 +117,50 @@ header h1{font-weight:700;font-size:24px;letter-spacing:-.02em}
 .sp:active{transform:scale(.98)}
 body.wo #cal{display:none!important}body:not(.wo) #wom{display:none!important}
 #wom .vb .btn{margin:0 12px 0 12px;flex:1}#wom .vb{gap:0;flex-wrap:nowrap}
+/* ---- redesign: warm, soft, editorial */
+body{font-family:'Plus Jakarta Sans',-apple-system,'SF Pro Display',Inter,system-ui,sans-serif}
+header{height:68px;padding:0 16px;gap:10px}
+header h1{flex:1;margin:0;text-align:center;font-size:17px;font-weight:600;letter-spacing:0}
+header .ib,.dn .ib{background:var(--sv);border-radius:16px;box-shadow:0 1px 2px #0000000d,0 4px 14px #0000000f}
+.card,.ath,.sp,.top{background:var(--sv);border:1px solid #00000008;border-radius:28px;box-shadow:0 1px 2px #00000008,0 10px 30px #0000000d}
+.card{padding:18px;margin:0 16px 14px}
+.sp{margin:0 16px 10px;border-radius:22px;padding:12px 14px;gap:12px}
+#meals .hd,#wom .hd{margin:18px 16px 8px;padding:0;background:none;font-size:18px;font-weight:700}
+#meals .hd .ib{background:var(--p);color:var(--onp)!important;border-radius:14px;width:38px;height:38px;font-size:24px!important;box-shadow:0 6px 14px #9a5a3a40}
+.btn{background:var(--p);color:var(--onp);border-radius:20px;padding:16px 20px;font-weight:600;box-shadow:0 8px 20px #9a5a3a33}
+.in,.f input,.f select{border-radius:16px;background:var(--bg);border:1px solid var(--ol)}
+#fsq{background:var(--sv) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='9' cy='9' r='6'/%3E%3Cpath d='M14 14l4 4'/%3E%3C/svg%3E") no-repeat 14px center;border:0;border-radius:18px;padding:15px 16px 15px 44px}
+#sum,#wst{background:#242220;color:#fff;border:0;box-shadow:0 14px 34px #24222040}
+#sum .mut,#wst .mut,#sum text:last-child{color:#ffffff9e;fill:#ffffff9e}
+#sum .bb{background:#ffffff26}#sum .bb i{background:#e0a57f}
+#sum circle[stroke="var(--ol)"]{stroke:#ffffff22}#sum circle[stroke="var(--p)"]{stroke:#e0a57f}
+#sum .btn2{background:#ffffff1f;color:#fff;box-shadow:none}
+#sum .in{background:#ffffff14;border-color:#ffffff26;color:#fff}
+footer.bar{margin:auto 16px calc(14px + env(safe-area-inset-bottom,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));border:0;border-radius:36px;background:#242220;padding:10px 6px;box-shadow:0 14px 34px #00000040}
+footer.bar *{color:#fff}
+.sheet{background:var(--bg)}
+#scrim{position:fixed;inset:0;background:#0006;opacity:0;pointer-events:none;transition:opacity .3s;z-index:35;backdrop-filter:blur(2px)}
+body.menu #scrim{opacity:1;pointer-events:auto}
+.tabs{position:fixed;top:0;bottom:0;left:0;width:78%;max-width:300px;z-index:40;margin:0;padding:calc(env(safe-area-inset-top,0px) + 28px) 14px 24px;display:flex;flex-direction:column;gap:6px;background:var(--sv);border-radius:0 32px 32px 0;box-shadow:0 0 60px #0000004d;transform:translateX(-105%);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+body.menu .tabs{transform:none}
+.tabs button{flex:none;display:flex;align-items:center;gap:14px;padding:15px 16px;border-radius:20px;font-size:16px;font-weight:600;color:var(--on);text-align:left;background:transparent;box-shadow:none}
+.tabs button.on{background:var(--p);color:var(--onp);box-shadow:0 8px 18px #9a5a3a50}
+.tabs svg{width:22px;height:22px;flex:none}
+.tabs .dh{padding:4px 16px 22px;font-size:26px;font-weight:700}
+/* ---- redesign v2: lime / forest */
+.btn{box-shadow:0 8px 22px #b6e24c55}
+#meals .hd .ib{color:var(--onp)!important;box-shadow:0 6px 14px #b6e24c55}
+.tabs button.on{box-shadow:0 8px 18px #b6e24c55}
+#sum,#whr{background:linear-gradient(150deg,#1d2a1c,#0a0e0a);color:#fff;border:0;box-shadow:0 14px 34px #0a0e0a55}
+#sum .bb i{background:#d4f78c}#sum circle[stroke="var(--p)"]{stroke:#d4f78c}
+#whr{padding:20px}
+#wst{background:var(--sv);color:var(--on);border:1px solid #00000008;box-shadow:0 1px 2px #00000008,0 10px 30px #0000000d}
+#wst .mut{color:var(--mut)}
+footer.bar{background:#0f150f}
+.tabs #tm{margin-top:auto;background:var(--bg)}
+#wom{padding-bottom:28px}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
 <body>
 <header>
@@ -126,7 +169,12 @@ body.wo #cal{display:none!important}body:not(.wo) #wom{display:none!important}
   <label class="tg"><input type="checkbox" id="camTg" aria-label="Camera"><i></i><b><svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 3 7.2 5H4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3.2L15 3zm3 14a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></svg></b></label>
   <button class="ib" id="gear" aria-label="Settings"><svg viewBox="0 0 24 24" width="28" height="28"><path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54A.48.48 0 0 0 13.9 2h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.6.22L2.69 8.47a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.12.22.37.29.61.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.49 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.01-1.58zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z"/></svg></button>
 </header>
-<nav class="tabs"><button id="t1" class="on">⏱ Timer</button><button id="t2">🍎 Calories</button><button id="t3">💪 Workouts</button></nav>
+<div id="scrim"></div>
+<nav class="tabs" aria-label="Menu"><div class="dh">Menu</div>
+<button id="t1" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>Timer</button>
+<button id="t2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-2-3-7-2-7 3 0 5 3 10 7 10s7-5 7-10c0-5-5-6-7-3zM12 7c0-2 1-3 3-4"/></svg>Calories</button>
+<button id="t3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>Workouts</button>
+<button id="tm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>Appearance</button></nav>
 <main class="cv" id="cal">
   <div class="dn"><button class="ib" id="dp" aria-label="Previous day" style="font-size:26px">‹</button><span id="dl"></span><button class="ib" id="dx" aria-label="Next day" style="font-size:26px">›</button></div>
   <div class="card" id="sum"></div>
@@ -144,10 +192,11 @@ body.wo #cal{display:none!important}body:not(.wo) #wom{display:none!important}
   <button class="btn2" id="lks" style="align-self:center;margin-top:8px">Continue without synced data</button>
 </div>
 <main class="cv" id="wom">
+  <div id="wds"></div><div class="card" id="whr"></div><div id="wcat"></div>
   <div class="vb" style="margin:0 0 10px"><label class="btn" style="display:inline-block;text-align:center">⬆ Import Garmin / Coros<input id="wfi" type="file" multiple accept=".csv,.tcx,.gpx,.fit,.txt" class="hide"></label><button class="btn" id="wadd" style="background:var(--sv);color:var(--on)">+ Add workout</button></div>
   <div id="wsr" class="hide" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">↻ Sync Coros</button><button class="btn2" id="wlk">Lock</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
   <div id="wfm" class="hide card"><div class="g2"><select class="in" id="w_t"><option>Run</option><option>Walk</option><option>Cycle</option><option>Swim</option><option>Hike</option><option>Strength</option><option>Other</option></select><input class="in" id="w_d" type="date"></div><input class="in" id="w_n" placeholder="Title (optional)" style="margin-top:6px"><div class="g2"><div><label class="mut" id="w_ml" style="font-size:12px">Distance (km)</label><input class="in" id="w_m" type="number" inputmode="decimal"></div><div><label class="mut" style="font-size:12px">Minutes</label><input class="in" id="w_s" type="number" inputmode="decimal"></div></div><div class="g2"><div><label class="mut" style="font-size:12px">Calories (blank = estimate)</label><input class="in" id="w_k" type="number" inputmode="numeric"></div><div><label class="mut" style="font-size:12px">Avg heart rate</label><input class="in" id="w_h" type="number" inputmode="numeric"></div></div><button class="btn" id="w_sv" style="margin:10px 0 0">Save workout</button></div>
-  <div class="card" id="wst"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
+  <div class="card" id="wst"></div><div class="card" id="wmi"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
   <div class="hd">History</div><div id="wlist"></div>
 </main>
 <div class="sheet hide" id="pf">
@@ -263,9 +312,11 @@ body.wo #cal{display:none!important}body:not(.wo) #wom{display:none!important}
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ls={g(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-let cfg=Object.assign({mode:'single',device:'iPhone',cd:3,line:50,sens:6,gap:2,ath:'Athlete 1',face:'environment',code:'',sm:'auto',rep:1,dist:60,reps:0,rest:90,ar:1,flip:'auto',lapm:'user',pal:'cal',look:'auto'},ls.g('cfg',{}));
+let cfg=Object.assign({mode:'single',device:'iPhone',cd:3,line:50,sens:6,gap:2,ath:'Athlete 1',face:'environment',code:'',sm:'auto',rep:1,dist:60,reps:0,rest:90,ar:1,flip:'auto',lapm:'user',pal:'lime',look:'auto'},ls.g('cfg',{}));
 if(!cfg.v2){cfg.v2=1;cfg.rep=1;cfg.sm='auto';cfg.reps=0;cfg.ar=1;ls.s('cfg',cfg);}
 if(!cfg.v3){cfg.v3=1;cfg.pal='cal';ls.s('cfg',cfg);}
+if(!cfg.v4){cfg.v4=1;cfg.pal='warm';ls.s('cfg',cfg);}
+if(!cfg.v5){cfg.v5=1;cfg.pal='lime';ls.s('cfg',cfg);}
 let runs=ls.g('runs',[]);
 let state='idle',goA=0,splits=[],cur=0,offset=0,bestRtt=1e9,room=null,joined='',stream=null,prev=null,hist=[],lastMove=0,react=null,ctx=null,fc=0,rtTimer=0,camErr='',peersN=0,mp=false,sid=0,open={},plan={on:false,reps:[],i:0,warn:[]},needF=1;
 const IC={stop:'<svg viewBox="0 0 24 24" width="26" height="26"><rect x="5" y="5" width="14" height="14" rx="1.5" fill="currentColor"/></svg>',play:'<svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>',chev:'<svg viewBox="0 0 24 24" width="28" height="28"><path d="M7 10l5 5 5-5z" fill="#4558a9"/></svg>',info:'<svg viewBox="0 0 24 24" width="30" height="30"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.6v.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>'};
@@ -750,6 +801,8 @@ $('pstop').onclick=()=>{if(state!=='idle')endRun(true);plan.on=false;planSheet()
 
 // ---------- themes: [bg, surface, container, primary, on-primary] for [light, dark]
 const PAL={
+ lime:[['#f3f5ef','#ffffff','#e8f0d8','#b6e24c','#10200a'],['#0b100b','#151c15','#1f2b1f','#d4f78c','#10200a']],
+ warm:[['#f5f3f0','#ffffff','#efe9e3','#9a5a3a','#ffffff'],['#121212','#1e1e1e','#2b2622','#d08a63','#1a1006']],
  cal:[['#ffffff','#f4f4f6','#e9e9ee','#111111','#ffffff'],['#000000','#1c1c1e','#2c2c2e','#ffffff','#000000']],
  indigo:[['#fdfbff','#ecebf4','#dde1ff','#4558a9','#ffffff'],['#121316','#2a2a33','#2f3f8c','#b6c4ff','#0b1b5c']],
  ocean:[['#f6fcfc','#e1eff0','#c3ebef','#00696f','#ffffff'],['#0d1415','#1d2b2d','#00494d','#4fd8e0','#00373a']],
@@ -949,18 +1002,31 @@ function pgpx(t){const x=new DOMParser().parseFromString(t,'text/xml'),out=[];x.
   for(let i=1;i<Q.length;i++){const a=Q[i-1],b=Q[i],r=Math.PI/180,dl=(b.la-a.la)*r,dn=(b.lo-a.lo)*r,h=Math.sin(dl/2)**2+Math.cos(a.la*r)*Math.cos(b.la*r)*Math.sin(dn/2)**2;m+=2*6371000*Math.asin(Math.sqrt(h));}
   pts.forEach(p=>{const e=p.getElementsByTagNameNS('*','hr')[0];if(e){hs+=+e.textContent;hn++;}});const t0=Q[0].t,t1=Q[Q.length-1].t;if(!t0)return;const nm=tk.querySelector('name')?.textContent||'Workout';out.push({d:dk(t0),t:ty((tk.querySelector('type')?.textContent||'')+' '+nm),n:nm,m,s:t1?(t1-t0)/1000:0,k:0,h:hn?hs/hn:0});});return out;}
 function addW(a){let n=0;a.forEach(r=>{const o={id:Date.now()*1000+Math.floor(Math.random()*1000),d:r.d,t:r.t||'Other',n:r.n||r.t,m:Math.round(r.m)||0,s:Math.round(r.s)||0,k:Math.round(r.k)||0,h:Math.round(r.h)||0};if(!o.s&&!o.m)return;if(!o.k)o.k=est(o);if(WO.some(w=>w.d===o.d&&w.t===o.t&&Math.abs(w.s-o.s)<5&&Math.abs(w.m-o.m)<20))return;WO.push(o);n++;});WO.sort((a,b)=>b.d.localeCompare(a.d));ls.s('calWo',WO);return n;}
+let MT='All',LT='',LD='';
 function wrender(){
   const du=P&&P.u==='i'?[1609.344,'mi']:[1000,'km'],fd=m=>r1(m/du[0])+' '+du[1],fh=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m';},pc=(s,m)=>{const p=Math.round(s/(m/du[0]));return Math.floor(p/60)+':'+String(p%60).padStart(2,'0')+' /'+du[1];},S=k=>WO.reduce((a,w)=>a+w[k],0);
   $('w_ml').textContent='Distance ('+du[1]+')';
   $('wst').innerHTML='<b>All time</b><div class="g2" style="margin-top:8px">'+[[WO.length,'Workouts'],[fd(S('m')),'Distance'],[fh(S('s')),'Time'],[Math.round(S('k')).toLocaleString(),'kcal burned']].map(x=>'<div><div style="font-size:24px;font-weight:700">'+x[0]+'</div><div class="mut">'+x[1]+'</div></div>').join('')+'</div>';
   $('wty').innerHTML='<b>By activity</b>'+(Object.keys(IW).map(t=>{const a=WO.filter(w=>w.t===t);if(!a.length)return '';const m=a.reduce((s,w)=>s+w.m,0),s=a.reduce((x,w)=>x+w.s,0);return '<div style="display:flex;justify-content:space-between;padding:7px 0"><span>'+IW[t]+' '+t+' · '+a.length+'</span><span class="mut">'+(m?fd(m)+' · ':'')+fh(s)+(m&&/Run|Walk|Hike/.test(t)?' · '+pc(s,m):'')+'</span></div>';}).join('')||'<div class="mut" style="margin-top:6px">Nothing yet. Import a Garmin or Coros export, or add a workout.</div>');
   const cw=new Date();cw.setDate(cw.getDate()-((cw.getDay()+6)%7));const bars=[];for(let i=7;i>=0;i--){const a=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()-i*7),b=new Date(a.getFullYear(),a.getMonth(),a.getDate()+7),ka=dk(a),kb=dk(b);bars.push([a,WO.filter(w=>w.d>=ka&&w.d<kb).reduce((s,w)=>s+w.k,0)]);}
+  const sel2=x=>MT==='All'?x.m>0:x.t===MT,wm=[];
+  for(let i=11;i>=0;i--){const a=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()-i*7),b=new Date(a.getFullYear(),a.getMonth(),a.getDate()+7),ka=dk(a),kb=dk(b);wm.push([a,WO.filter(w=>w.d>=ka&&w.d<kb&&sel2(w)).reduce((s,w)=>s+w.m,0)]);}
+  const mu=m=>r1(m/du[0]),mm=Math.max(1,...wm.map(x=>x[1])),tw=wm[11][1],lw=wm[10][1],df=tw-lw,avg=wm.slice(0,11).reduce((s,x)=>s+x[1],0)/11;
+  $('wmi').innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px"><b>Weekly mileage</b><span>'+['All','Run','Cycle','Walk','Hike'].map(t=>'<button class="btn2" data-mt="'+t+'" style="padding:4px 10px;font-size:12px;margin-left:4px;'+(t===MT?'background:var(--p);color:var(--onp)':'')+'">'+t+'</button>').join('')+'</span></div><div style="margin:10px 0 2px"><span style="font-size:30px;font-weight:700">'+mu(tw)+'</span> <span class="mut">'+du[1]+' this week</span></div><div class="mut" style="font-size:13px">'+(lw?(df>=0?'+':'−')+mu(Math.abs(df))+' '+du[1]+' vs last week · ':'')+'11-week average '+mu(avg)+' '+du[1]+'</div><div style="display:flex;align-items:flex-end;gap:4px;margin-top:12px">'+wm.map((x,i)=>'<div style="flex:1;text-align:center;font-size:10px"><div class="mut">'+(x[1]?mu(x[1]):'')+'</div><div style="height:'+Math.max(3,x[1]/mm*70)+'px;background:var(--p);opacity:'+(i===11?1:.55)+';border-radius:6px;margin:2px 0"></div>'+(x[0].getMonth()+1)+'/'+x[0].getDate()+'</div>').join('')+'</div>';
   const mx=Math.max(1,...bars.map(b=>b[1]));
   $('wch').innerHTML='<b>Calories burned per week</b><div style="display:flex;align-items:flex-end;gap:6px;margin-top:10px">'+bars.map(b=>'<div style="flex:1;text-align:center;font-size:10px"><div class="mut">'+(b[1]?Math.round(b[1]):'')+'</div><div style="height:'+Math.max(3,b[1]/mx*60)+'px;background:var(--p);border-radius:6px;margin:2px 0"></div>'+(b[0].getMonth()+1)+'/'+b[0].getDate()+'</div>').join('')+'</div>';
   const top=(f,g)=>{const b=WO.reduce((x,w)=>(!x||f(w)>f(x))?w:x,null);return b&&f(b)>0?g(b)+' <span class="mut">'+b.d+'</span>':'–';},fr=WO.filter(w=>w.t==='Run'&&w.m>=1000).sort((a,b)=>a.s/a.m-b.s/b.m)[0];
   $('wpr').innerHTML='<b>Personal bests</b>'+[['Longest distance',top(w=>w.m,w=>fd(w.m))],['Longest workout',top(w=>w.s,w=>fh(w.s))],['Most calories',top(w=>w.k,w=>w.k+' kcal')],['Fastest run pace',fr?pc(fr.s,fr.m)+' <span class="mut">'+fr.d+'</span>':'–']].map(x=>'<div style="display:flex;justify-content:space-between;padding:7px 0"><span>'+x[0]+'</span><span>'+x[1]+'</span></div>').join('');
-  $('wlist').innerHTML=WO.slice(0,100).map(w=>'<div class="sp"><div style="font-size:26px">'+IW[w.t]+'</div><div class="sm"><div>'+esc(w.n)+'</div><div class="mut">'+w.d+(w.m?' · '+fd(w.m):'')+' · '+fh(w.s)+(w.m&&/Run|Walk|Hike/.test(w.t)?' · '+pc(w.s,w.m):'')+(w.h?' · '+w.h+' bpm':'')+'</div></div><b style="font-size:17px">'+w.k+' kcal</b><button class="ib" data-w="'+w.id+'" aria-label="Delete">✕</button></div>').join('');
+  const wdl=['M','T','W','T','F','S','S'],tdk=dk(new Date()),PC={Run:'#fde7d6',Cycle:'#dbeafe',Walk:'#e4f3d4',Swim:'#d5f0f4',Hike:'#efe4d1',Strength:'#f1dcf3',Other:'#ececec'};
+  $('wds').innerHTML='<div style="display:flex;gap:6px;margin:0 16px 14px">'+wdl.map((l,i)=>{const d=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()+i),k=dk(d),on=k===tdk;return '<button data-ld="'+k+'" style="flex:1;padding:9px 0;border-radius:18px;text-align:center;font-weight:600;'+(on?'background:var(--p);color:var(--onp);':'background:var(--sv);')+(LD===k?'outline:2px solid var(--on);outline-offset:1px;':'')+'"><div style="font-size:11px;opacity:.7">'+l+'</div><div style="font-size:16px">'+d.getDate()+'</div><div style="height:8px;font-size:8px;line-height:8px">'+(WO.some(w=>w.d===k)?'●':'')+'</div></button>';}).join('')+'</div>';
+  const L1=WO[0];
+  $('whr').innerHTML=L1?'<div style="font-size:12px;opacity:.7">Latest session</div><div style="font-size:28px;font-weight:700;margin:4px 0 2px">'+esc(L1.n)+'</div><div style="opacity:.7">'+L1.t+' · '+L1.d+'</div><div style="display:flex;gap:16px;margin-top:14px;align-items:center"><span>'+fh(L1.s)+'</span><span>'+L1.k+' kcal</span>'+(L1.m?'<span>'+fd(L1.m)+'</span>':'')+'<button data-go="1" aria-label="See history" style="margin-left:auto;width:48px;height:48px;border-radius:50%;background:#d4f78c;color:#10200a;font-size:24px">›</button></div>':'<div style="font-size:22px;font-weight:700">No sessions yet</div><div style="opacity:.7;margin-top:4px">Import your Coros data or add a workout below.</div>';
+  $('wcat').innerHTML='<div style="margin:0 16px 8px;font-weight:700;font-size:18px">Categories</div><div style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 14px">'+Object.keys(IW).map(t=>'<button data-lt="'+t+'" style="flex:none;width:104px;padding:14px 12px;border-radius:24px;text-align:left;color:#1b1b1f;background:'+PC[t]+';'+(LT===t?'outline:2px solid var(--on);outline-offset:2px;':'')+'"><div style="font-size:12px;opacity:.7">'+WO.filter(w=>w.t===t).length+' sessions</div><div style="font-weight:700;font-size:16px;margin-top:2px">'+t+'</div><div style="font-size:26px;margin-top:8px">'+IW[t]+'</div></button>').join('')+'</div>';
+  const LW=WO.filter(w=>(!LT||w.t===LT)&&(!LD||w.d===LD));
+  $('wlist').innerHTML=(LT||LD?'<div class="mut" style="margin:0 16px 8px">Showing '+[LT,LD].filter(Boolean).join(' · ')+' <button class="btn2" data-clr="1" style="padding:2px 10px;font-size:12px">Clear</button></div>':'')+LW.slice(0,100).map(w=>'<div class="sp"><div style="font-size:26px">'+IW[w.t]+'</div><div class="sm"><div>'+esc(w.n)+'</div><div class="mut">'+w.d+(w.m?' · '+fd(w.m):'')+' · '+fh(w.s)+(w.m&&/Run|Walk|Hike/.test(w.t)?' · '+pc(w.s,w.m):'')+(w.h?' · '+w.h+' bpm':'')+'</div></div><b style="font-size:17px">'+w.k+' kcal</b><button class="ib" data-w="'+w.id+'" aria-label="Delete">✕</button></div>').join('');
 }
+$('wmi').onclick=e=>{const b=e.target.closest('[data-mt]');if(b){MT=b.dataset.mt;wrender();}};
+$('wom').addEventListener('click',e=>{const a=e.target.closest('[data-ld],[data-lt],[data-go],[data-clr]');if(!a)return;const d=a.dataset;if(d.ld!==undefined)LD=LD===d.ld?'':d.ld;if(d.lt!==undefined)LT=LT===d.lt?'':d.lt;if(d.clr!==undefined){LT='';LD='';}wrender();if(d.go!==undefined)$('wlist').scrollIntoView({behavior:'smooth',block:'start'});});
 $('wlist').onclick=e=>{const b=e.target.closest('[data-w]');if(!b)return;WO=WO.filter(w=>String(w.id)!==b.dataset.w);ls.s('calWo',WO);wrender();};
 $('wfi').onchange=async e=>{let n=0,fit=0;for(const f of e.target.files){const fn=f.name.toLowerCase();if(fn.endsWith('.fit')){fit++;continue;}try{const tx=await f.text();n+=addW(fn.endsWith('.tcx')?ptcx(tx):fn.endsWith('.gpx')?pgpx(tx):pcsv(tx));}catch(x){}}e.target.value='';wrender();toast(n?'Imported '+n+' workout'+(n>1?'s':''):fit?'FIT files can’t be read yet. Export CSV, TCX or GPX instead.':'No new workouts found in that file.');};
 $('wadd').onclick=()=>{$('w_d').value=dk(new Date());$('wfm').classList.toggle('hide');};
@@ -997,6 +1063,11 @@ function prof(){
 }
 $('pcard').onclick=e=>{if(e.target.closest('[data-p]'))openPf();};
 
+// ----- menu drawer (hamburger)
+(()=>{const b=document.createElement('button');b.className='ib';b.id='mb';b.setAttribute('aria-label','Menu');b.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>';document.querySelector('header').prepend(b);const m=o=>document.body.classList.toggle('menu',o);b.onclick=()=>m(true);$('scrim').onclick=()=>m(false);['t1','t2','t3'].forEach(i=>$(i).addEventListener('click',()=>m(false)));document.addEventListener('keydown',e=>{if(e.key==='Escape')m(false);});
+  const tmb=$('tm'),up=()=>{tmb.lastChild.textContent='Appearance: '+({auto:'Auto',light:'Light',dark:'Dark'}[cfg.look||'auto']);};up();
+  tmb.onclick=()=>{cfg.look={auto:'light',light:'dark',dark:'auto'}[cfg.look||'auto'];ls.s('cfg',cfg);applyTheme();try{applyCfg();}catch(e){}up();};})();
+
 // ----- Strava sync (encrypted file written by the GitHub Action)
 const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),SF='data/workouts.enc';
 let sfile=null,skey=null;
@@ -1017,6 +1088,7 @@ $('wsb').onclick=async()=>{const f=await getFile();if(!f)return toast('Couldn’
 $('wlk').onclick=()=>{ls.s('calKey',null);skey=null;WO=WO.filter(w=>!w.sid);ls.s('calWo',WO);$('wsr').classList.add('hide');wrender();render();$('lk').classList.remove('hide');};
 (async()=>{sfile=await getFile();if(!sfile||!window.crypto||!crypto.subtle)return;const ck=ls.g('calKey',null);if(ck&&ck.salt===sfile.salt){try{await loadSync(await crypto.subtle.importKey('raw',b64(ck.k),'AES-GCM',false,['decrypt']),sfile);return;}catch(e){}}$('lk').classList.remove('hide');})();
 
+tab(2);
 // ----- scan food with Claude
 async function ai(file){
   let s=null;try{s=window.claude&&await claude.use('sample');}catch(e){}
