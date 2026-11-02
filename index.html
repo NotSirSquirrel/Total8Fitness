@@ -189,10 +189,22 @@ footer.bar{background:var(--fbg,#0d0d0d)}
 .bct .ib{background:#0009;color:#fff}
 .bcn{position:absolute;left:0;right:0;bottom:0;padding:40px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,#000d 35%)}
 .bcn .in{background:#ffffff1f;border-color:#ffffff40;color:#fff}.bcn .btn2{background:#ffffff26;color:#fff;box-shadow:none}
+
+/* ---- login / vault */
+body.locked>*:not(#vlock):not(script){display:none!important}
+#vlock{position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto;display:grid;place-items:center;padding:calc(24px + env(safe-area-inset-top,0px)) 24px 24px}
+#vlock form{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+.vli{width:64px;height:64px;border-radius:20px;background:var(--p);color:var(--onp);display:grid;place-items:center;margin-bottom:6px;box-shadow:0 10px 24px var(--bsh,#00000030)}
+#vlock h1{font-size:26px;font-weight:700;margin:0;letter-spacing:-.02em}
+#vlock .btn{margin:4px 0 0;width:100%}#vlock .btn:disabled{opacity:.5}
+.vlr{display:flex;gap:8px;align-items:center}#vle{color:var(--red);font-size:14px;min-height:20px}
+#vsec{z-index:90}#vsec .in{margin-bottom:8px}
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#4558a9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
-<body>
+<body class="locked">
+<div id="vlock"><form id="vlf"><div class="vli"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h1 id="vlt"></h1><div class="mut" id="vls"></div><input type="text" name="username" value="tracker" autocomplete="username" hidden><div class="vlr"><input class="in" id="vlp" type="password" placeholder="Passphrase" required><button type="button" class="btn2" id="vlsh">Show</button></div><input class="in" id="vlc" type="password" autocomplete="new-password" placeholder="Confirm passphrase"><label class="mut vlr" style="font-size:14px"><input type="checkbox" id="vlk"> Stay signed in on this device for 30 days</label><div id="vle" role="alert"></div><button class="btn" id="vlb" type="submit"></button><div class="mut" id="vlw" style="font-size:13px"></div><button type="button" class="btn2" id="vlx" style="align-self:center">Forgot it? Erase this device’s data</button></form></div>
+
 <header>
   <button class="ib" id="back" aria-label="Clear"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <h1>Track Workout</h1>
@@ -342,9 +354,81 @@ footer.bar{background:var(--fbg,#0d0d0d)}
 <div id="toast"></div>
 
 <script>
+(()=>{
+const $=id=>document.getElementById(id),E=new TextEncoder(),T=new TextDecoder(),M=new Map(),Q={};
+const b2=u=>{let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s);},u2=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const MK='vault:meta',SK='vault:sess',KP='vault:keep',PF='v:',DAY=864e5,LOCK_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',SH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>';
+let KEY=null,meta=null,keep=false,fails=0,until=0;
+try{meta=JSON.parse(localStorage.getItem(MK)||'null');}catch(e){}
+const derive=async(pw,salt)=>{const km=await crypto.subtle.importKey('raw',E.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);};
+const imp=raw=>crypto.subtle.importKey('raw',u2(raw),'AES-GCM',true,['encrypt','decrypt']);
+const rawOf=async k=>b2(new Uint8Array(await crypto.subtle.exportKey('raw',k)));
+const enc=async(s,k=KEY)=>{const iv=crypto.getRandomValues(new Uint8Array(12));return b2(iv)+'.'+b2(new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,E.encode(s))));};
+const dec=async(t,k=KEY)=>{const[i,c]=t.split('.');return T.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:u2(i)},k,u2(c)));};
+const verify=async k=>{try{return await dec(meta.chk,k)==='vault-ok';}catch(e){return false;}};
+async function loadAll(){for(const k of Object.keys(localStorage))if(k.startsWith(PF)){try{M.set(k.slice(2),await dec(localStorage.getItem(k)));}catch(e){}}}
+window.V={g:k=>M.get(k),s:(k,v)=>{M.set(k,v);Q[k]=(Q[k]||Promise.resolve()).then(async()=>{try{localStorage.setItem(PF+k,await enc(M.get(k)));}catch(e){}});},d:k=>{M.delete(k);localStorage.removeItem(PF+k);}};
+const relock=()=>{sessionStorage.removeItem(SK);localStorage.removeItem(KP);location.reload();};
+const wipe=()=>{if(prompt('This permanently deletes all tracker data on this device. Type ERASE to confirm.')==='ERASE'){localStorage.clear();sessionStorage.clear();location.reload();}};
+async function auto(){try{let raw=sessionStorage.getItem(SK);const kp=JSON.parse(localStorage.getItem(KP)||'null');if(kp&&kp.e>Date.now()){raw=raw||kp.k;keep=true;}else if(kp)localStorage.removeItem(KP);if(!raw||!meta)return false;const k=await imp(raw);if(!(await verify(k)))return false;KEY=k;await loadAll();return true;}catch(e){return false;}}
+async function boot(stay){
+  const raw=await rawOf(KEY);sessionStorage.setItem(SK,raw);
+  if(stay){localStorage.setItem(KP,JSON.stringify({k:raw,e:Date.now()+30*DAY}));keep=true;}else if(stay===false){localStorage.removeItem(KP);keep=false;}
+  document.body.classList.remove('locked');$('vlock').remove();
+  const sc=document.createElement('script');sc.textContent=$('app').textContent;document.body.appendChild(sc);
+  const mk=(h,f)=>{const b=document.createElement('button');b.innerHTML=h;b.onclick=()=>{document.body.classList.remove('menu');f();};return b;};
+  if($('t3'))$('t3').after(mk(LOCK_ICON+'Lock now',relock),mk(SH_ICON+'Security',openSec));
+  let hid=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hid=Date.now();else if(hid&&Date.now()-hid>6e5&&!keep)relock();});
+}
+function openSec(){
+  const o=document.createElement('div');o.id='vsec';o.className='sheet';
+  o.innerHTML='<header><button class="ib" id="vsb" aria-label="Back"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1>Security</h1><span style="width:44px"></span></header>'+
+  '<div class="card"><label class="vlr"><input type="checkbox" id="vsk"'+(keep?' checked':'')+'><b>Stay signed in on this device</b></label><div class="mut" style="margin-top:6px">Skips the passphrase for 30 days. Anyone holding this unlocked phone can open the app. Off is safer.</div></div>'+
+  '<div class="card"><b>Change passphrase</b><div style="margin-top:10px"><input class="in" id="vso" type="password" placeholder="Current passphrase" autocomplete="current-password"><input class="in" id="vsn" type="password" placeholder="New passphrase (8+ characters)" autocomplete="new-password"><input class="in" id="vsm" type="password" placeholder="Confirm new passphrase" autocomplete="new-password"></div><button class="btn2" id="vsc">Change passphrase</button><div id="vsr" class="mut" style="margin-top:8px" role="status"></div></div>'+
+  '<div class="card"><b>Erase data</b><div class="mut" style="margin:6px 0 10px">Deletes everything this app stores on this device.</div><button class="btn2" id="vse" style="color:var(--red)">Erase all data</button></div>';
+  document.body.appendChild(o);$('vsb').onclick=()=>o.remove();$('vse').onclick=wipe;
+  $('vsk').onchange=async e=>{if(e.target.checked){localStorage.setItem(KP,JSON.stringify({k:await rawOf(KEY),e:Date.now()+30*DAY}));keep=true;}else{localStorage.removeItem(KP);keep=false;}};
+  $('vsc').onclick=async()=>{const m=t=>$('vsr').textContent=t,n=$('vsn').value;if(n.length<8||n!==$('vsm').value)return m('The new passphrase must match and be 8+ characters.');m('Working…');
+    if(!(await verify(await derive($('vso').value,u2(meta.salt)))))return m('Current passphrase is wrong.');
+    const salt=crypto.getRandomValues(new Uint8Array(16)),k=await derive(n,salt),out=[];for(const[x,v]of M)out.push([PF+x,await enc(v,k)]);
+    const nm={salt:b2(salt),chk:await enc('vault-ok',k)};out.forEach(([a,b])=>localStorage.setItem(a,b));localStorage.setItem(MK,JSON.stringify(nm));meta=nm;KEY=k;sessionStorage.setItem(SK,await rawOf(k));if(keep)localStorage.setItem(KP,JSON.stringify({k:await rawOf(k),e:Date.now()+30*DAY}));
+    ['vso','vsn','vsm'].forEach(i=>$(i).value='');m('Passphrase changed.');};
+}
+function show(){
+  const first=!meta;$('vlt').textContent=first?'Create your passphrase':'Welcome back';
+  $('vls').textContent=first?'This locks your workouts, food log and settings on this device.':'Enter your passphrase to unlock.';
+  $('vlc').hidden=first?false:true;$('vlp').autocomplete=first?'new-password':'current-password';$('vlb').textContent=first?'Create and unlock':'Unlock';
+  $('vlw').textContent=first?'There is no recovery. If you forget this passphrase, your data cannot be restored. Pick something long that you will remember.':'';
+  $('vlx').hidden=first;$('vlx').onclick=wipe;
+  $('vlsh').onclick=()=>{const h=$('vlp').type==='password';$('vlp').type=h?'text':'password';$('vlsh').textContent=h?'Hide':'Show';};
+  $('vlf').onsubmit=async e=>{e.preventDefault();const pw=$('vlp').value,err=$('vle'),b=$('vlb');err.textContent='';
+    if(Date.now()<until)return err.textContent='Too many tries. Wait '+Math.ceil((until-Date.now())/1000)+' seconds.';
+    if(first){if(pw.length<8)return err.textContent='Use at least 8 characters. A few random words works well.';if(pw!==$('vlc').value)return err.textContent='The passphrases don’t match.';}
+    b.disabled=true;b.textContent=first?'Securing…':'Unlocking…';
+    try{
+      if(first){
+        const salt=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(pw,salt);
+        const old=Object.keys(localStorage).filter(x=>!x.startsWith('vault:')&&!x.startsWith(PF)),out=[];
+        for(const x of old){const v=localStorage.getItem(x);M.set(x,v);out.push([PF+x,await enc(v)]);}
+        meta={salt:b2(salt),chk:await enc('vault-ok')};out.forEach(([a,c])=>localStorage.setItem(a,c));localStorage.setItem(MK,JSON.stringify(meta));old.forEach(x=>localStorage.removeItem(x));
+      }else{
+        const k=await derive(pw,u2(meta.salt));
+        if(!(await verify(k))){if(++fails>=5){until=Date.now()+3e4;fails=0;}err.textContent='Wrong passphrase.';b.disabled=false;b.textContent='Unlock';return;}
+        KEY=k;await loadAll();
+      }
+      await boot($('vlk').checked);
+    }catch(x){err.textContent='Couldn’t unlock. Make sure the page is on HTTPS and try again.';b.disabled=false;b.textContent=first?'Create and unlock':'Unlock';}
+  };
+  $('vlp').focus();
+}
+(async()=>{if(!window.crypto||!crypto.subtle){$('vlt').textContent='Secure connection needed';$('vls').textContent='Open this app over HTTPS to unlock it.';$('vlp').hidden=true;$('vlb').hidden=true;$('vlk').parentNode.hidden=true;$('vlc').hidden=true;return;}
+  if(await auto())await boot();else show();})();
+})();
+</script>
+<script id="app" type="text/plain">
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const ls={g(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const ls={g(k,d){try{const v=V.g(k);return v==null?d:JSON.parse(v)}catch(e){return d}},s(k,v){try{V.s(k,JSON.stringify(v))}catch(e){}}};
 let cfg=Object.assign({mode:'single',device:'iPhone',cd:3,line:50,sens:6,gap:2,ath:'Athlete 1',face:'environment',code:'',sm:'auto',rep:1,dist:60,reps:0,rest:90,ar:1,flip:'auto',lapm:'user',pal:'lime',look:'auto'},ls.g('cfg',{}));
 if(!cfg.v2){cfg.v2=1;cfg.rep=1;cfg.sm='auto';cfg.reps=0;cfg.ar=1;ls.s('cfg',cfg);}
 if(!cfg.v3){cfg.v3=1;cfg.pal='cal';ls.s('cfg',cfg);}
@@ -748,7 +832,7 @@ function resetRep(){
 }
 $('rs').onclick=resetRep;
 setInterval(()=>{if(cfg.mode==='finish'&&room&&peersN>1)sync();},5000);
-$('rst').onclick=()=>{if(confirm('Reset all settings to their defaults? Your saved runs are kept.')){try{localStorage.removeItem('cfg');}catch(e){}location.reload();}};
+$('rst').onclick=()=>{if(confirm('Reset all settings to their defaults? Your saved runs are kept.')){try{V.d('cfg');}catch(e){}location.reload();}};
 document.querySelector('[data-k=face]').addEventListener('change',()=>{if(stream){stopCam();$('camTg').checked=false;toast('Camera switched. Turn the camera back on.');}});
 
 // ---------- coach workout: paste -> analyze -> rep counter vs target
@@ -1154,28 +1238,127 @@ Rules: list every food and drink separately. Estimate weight from scale cues (a 
 const SYSL=`You read Nutrition Facts labels. Return ONLY JSON: {"name":"product name","items":[{"n":"product name","g":serving size in grams or ml,"k":kcal per serving,"p":protein g,"c":carbs g,"f":fat g,"conf":legibility 0 to 1,"note":"e.g. 8 servings per container"}],"q":""}. Use exactly one serving as printed. If the label is unreadable return {"items":[]}.`;
 const tob64=b=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(',')[1]);x.readAsDataURL(b);});
 async function prep(f){const bm=await createImageBitmap(f,{imageOrientation:'from-image'}),k=Math.min(1,1280/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.82));}
+// ----- on-device AI (no server): local OCR for labels, local vision model for meals, local nutrition table for the numbers
+const AI={ready:false,busy:null},TJS='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2/+esm',VM='HuggingFaceTB/SmolVLM-500M-Instruct',TES='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/+esm';
+const DG=`rice,white rice|130|2.7|28|0.3
+brown rice|123|2.7|26|1
+pasta,noodles,spaghetti,macaroni|158|5.8|31|0.9
+bread,toast|265|9|49|3.2
+tortilla,wrap|312|8|52|8
+oatmeal,porridge|71|2.5|12|1.5
+cereal|380|7|84|1.5
+chicken breast,chicken|165|31|0|3.6
+chicken thigh|209|26|0|11
+steak,beef|206|30|0|9
+ground beef,hamburger patty,meatball|250|26|0|15
+pork,ham|242|27|0|14
+bacon|541|37|1.4|42
+sausage|301|12|2|27
+salmon|206|22|0|12
+tuna|132|28|0|1.3
+fish,cod,tilapia|128|26|0|2.7
+shrimp,prawn|99|24|0.2|0.3
+egg,eggs,omelet,omelette|155|13|1.1|11
+tofu|144|17|3|9
+beans,black beans,kidney beans,chickpeas|132|8.9|24|0.5
+lentils|116|9|20|0.4
+potato,mashed potato|87|1.9|20|0.1
+french fries,fries|312|3.4|41|15
+sweet potato|90|2|21|0.2
+broccoli|35|2.4|7|0.4
+carrot|41|0.9|10|0.2
+salad,lettuce,greens,spinach|15|1.4|2.9|0.2
+tomato|18|0.9|3.9|0.2
+cucumber|15|0.7|3.6|0.1
+onion|40|1.1|9|0.1
+corn|96|3.4|21|1.5
+mixed vegetables,vegetables|65|2.6|13|0.3
+cheddar,cheese|403|25|1.3|33
+mozzarella|280|28|3|17
+greek yogurt|59|10|3.6|0.4
+yogurt|61|3.5|4.7|3.3
+milk|61|3.2|4.8|3.3
+butter|717|0.9|0.1|81
+olive oil,oil|884|0|0|100
+sauce,dressing,gravy|150|1.5|10|12
+avocado,guacamole|160|2|9|15
+banana|89|1.1|23|0.3
+apple|52|0.3|14|0.2
+orange|47|0.9|12|0.1
+grapes|69|0.7|18|0.2
+strawberries,berries|32|0.7|7.7|0.3
+pizza|266|11|33|10
+burger,cheeseburger,sandwich|260|13|28|11
+peanut butter|588|25|20|50
+almonds,nuts|579|21|22|50
+chocolate|546|5|60|31
+ice cream|207|3.5|24|11
+cake,pastry,muffin,donut|350|4|50|15
+cookie,cookies|450|5|64|21
+soda,cola|42|0|10.6|0
+juice|45|0.7|10|0.2
+beer|43|0.5|3.6|0
+coffee,tea,water|1|0.1|0|0`.split('\n').map(l=>{const a=l.split('|');return{a:a[0].split(','),k:+a[1],p:+a[2],c:+a[3],f:+a[4]}});
+function dgm(n){n=' '+n.toLowerCase().replace(/[^a-z ]/g,' ')+' ';let b=null,bl=0;for(const e of DG)for(const a of e.a){if(a.length>bl&&(n.includes(' '+a+' ')||n.includes(' '+a+'s ')||n.includes(' '+a))){b=e;bl=a.length;}}return b;}
+function mk(n,g,e,cf,note){g=Math.max(5,Math.min(1500,Math.round(g)));const q=g/100;return e?{n:n,g:g,k:e.k*q,p:e.p*q,c:e.c*q,f:e.f*q,conf:cf,note:note}:{n:n,g:g,k:1.5*g,p:.08*g,c:.15*g,f:.05*g,conf:.25,note:'Not in the food table, rough guess. Use + Add an item to fix.'};}
+const NW={a:1,an:1,one:1,two:2,three:3,four:4,half:.5};
+function ptx(t){const out=[];t.split(/,|;|\n|\+|\band\b|\bwith\b/i).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+  const m=s.match(/^(\d+(?:\.\d+)?|a|an|one|two|three|four|half)?\s*(g|grams?|ml|oz|cups?|tbsp|tsp|slices?)?\s*(?:of\s+)?(.+)$/i);if(!m)return;
+  let q=m[1]?(NW[m[1].toLowerCase()]||+m[1]):1,u=(m[2]||'').toLowerCase(),nm=m[3];
+  if(/^(g|gram)/.test(u)){out.push(mk(nm,q,dgm(nm),.7,'Amount you gave'));return;}
+  if(u==='oz'){out.push(mk(nm,q*28.35,dgm(nm),.7,'Amount you gave'));return;}
+  const w=nm.toLowerCase().replace(/[^a-z ]/g,' ').split(/\s+/).filter(x=>x.length>2);let b=null,bs=0;
+  for(const d of D){const dn=d.n.toLowerCase().split(',')[0].split(/\s+/);const sc=dn.filter(x=>w.some(y=>y.startsWith(x.slice(0,4))||x.startsWith(y.slice(0,4)))).length/dn.length;if(sc>bs){bs=sc;b=d;}}
+  const sg=b&&(b.s.match(/(\d+(?:\.\d+)?)\s*g\b/)||[])[1];
+  if(b&&bs>=.99){const g=sg?q*sg:100;out.push({n:b.n,g:g,k:b.k*(sg?q:q),p:b.p*q,c:b.c*q,f:b.f*q,conf:.8,note:(sg?'':q+' × ')+b.s});}
+  else out.push(mk(nm,100*q,dgm(nm),.45,'Portion assumed, adjust amount'));});
+  return out;}
+function parseLabel(t){const x=t.replace(/\r/g,'').replace(/[Oo](?=\d)/g,'0'),num=r=>{const m=x.match(r);return m?parseFloat(m[1].replace(',','.')):0;};
+  const g=num(/serving\s*size[^\n(]*\(\s*(\d+(?:\.\d+)?)\s*(?:g|ml)/i)||num(/serving\s*size[^\n]*?(\d+(?:\.\d+)?)\s*(?:g|ml)\b/i),
+  k=num(/calories\D{0,8}(\d{2,4})/i),p=num(/protein\D{0,6}(\d+(?:[.,]\d+)?)\s*g/i),c=num(/total\s*carb\w*\D{0,6}(\d+(?:[.,]\d+)?)\s*g/i),f=num(/total\s*fat\D{0,6}(\d+(?:[.,]\d+)?)\s*g/i);
+  if(!k)return null;const a=4*p+4*c+9*f,ok=a>0&&Math.abs(k-a)/Math.max(k,a)<.25;
+  return{n:'Packaged food',g:g||100,k:k,p:p,c:c,f:f,conf:ok?.95:.6,note:(g?'':'Serving size not read, check it · ')+(ok?'Read from the label':'Numbers don’t add up, double-check them')};}
+async function aiLoad(){
+  if(AI.ready)return AI;
+  if(!navigator.gpu)throw{code:'http',message:'Meal photos need a browser with WebGPU (current Chrome on Android, or iOS 26+). Labels and descriptions still work.'};
+  if(!AI.busy)AI.busy=(async()=>{
+    try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
+    const T=await import(TJS),pg=p=>{if(p.status==='progress'&&p.total){const e=$('scs')||$('aist');if(e)e.textContent='Downloading food model… '+Math.round(p.loaded/p.total*100)+'% (one time)';}};
+    const processor=await T.AutoProcessor.from_pretrained(VM,{progress_callback:pg});
+    const model=await T.AutoModelForVision2Seq.from_pretrained(VM,{dtype:{embed_tokens:'fp16',vision_encoder:'q4',decoder_model_merged:'q4'},device:'webgpu',progress_callback:pg});
+    Object.assign(AI,{T:T,processor:processor,model:model,ready:true});
+  })().catch(e=>{AI.busy=null;throw e;});
+  await AI.busy;return AI;}
+const aiStatus=()=>AI.ready?'Food model loaded. Photos never leave your phone.':'Meal photos use a small vision model that runs on your phone. One-time download of about 500 MB, then it works offline. Labels and typed descriptions work without it.';
+async function vlm(blob,note){
+  const{T,processor,model}=await aiLoad(),img=await T.RawImage.fromBlob(blob);
+  const q='List every food and drink in this photo, one per line as "name | grams". Estimate the weight in grams that is actually on the plate, using the plate, fork, cup or hand for scale. Use simple names like grilled chicken breast, white rice, broccoli. No other text.'+(note?' Context: '+note:'');
+  const text=processor.apply_chat_template([{role:'user',content:[{type:'image'},{type:'text',text:q}]}],{add_generation_prompt:true});
+  const inputs=await processor(text,[img],{do_image_splitting:(navigator.deviceMemory||0)>=6});
+  const out=await model.generate({...inputs,max_new_tokens:220,do_sample:false});
+  return processor.batch_decode(out.slice(null,[inputs.input_ids.dims.at(-1),null]),{skip_special_tokens:true})[0];}
+async function ocr(blob){const T=await import(TES),w=await(T.createWorker||T.default.createWorker)('eng');try{return(await w.recognize(blob)).data.text;}finally{await w.terminate();}}
 async function ask(sys,txt,bl){
-  let s=null;try{s=window.claude&&await claude.use('sample');}catch(e){}
-  if(s){try{const lim=s.limits?await s.limits():{images:true};if(!bl.length||lim.images)return await s.json(sys+'\n\n'+txt,bl.length?{images:bl,modelTier:'complex'}:{modelTier:'complex'});}catch(e){if(!ls.g('aiKey',''))throw e;}}
-  const key=ls.g('aiKey','');if(!key)throw{code:'no_ai'};
-  const content=[];for(const b of bl)content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await tob64(b)}});content.push({type:'text',text:txt});
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:AIM,max_tokens:1500,system:sys,messages:[{role:'user',content}]})});
-  if(!r.ok)throw{code:'http',message:r.status===401?'That API key was rejected.':'AI request failed ('+r.status+').'};
-  const t=(await r.json()).content.map(x=>x.text||'').join('');return JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1));
-}
+  const fx=(txt.match(/Correction from the person: ([^\n]*)/)||[])[1];
+  if(fx&&SC.r){const keep=SC.r.items.map(i=>({n:i.n,g:i.a,k:i.k*i.a/i.b,p:i.p*i.a/i.b,c:i.c*i.a/i.b,f:i.f*i.a/i.b,conf:i.conf,note:i.note}));return{name:SC.r.name,items:keep.concat(ptx(fx)),q:''};}
+  if(sys===SYSL){const t=parseLabel(await ocr(bl[0]));return{name:t?t.n:'',items:t?[t]:[],q:''};}
+  if(!bl.length)return{name:'Meal',items:ptx(SC.note),q:''};
+  const raw=await vlm(bl[0],SC.note),items=[];
+  raw.split('\n').forEach(l=>{const m=l.match(/^[\s\-*\d.)]*([A-Za-z][A-Za-z ,'-]*?)\s*[|:–-]\s*~?(\d+)/);if(m){const e=dgm(m[1]);items.push(mk(m[1].trim(),+m[2],e,e?.6:.25,e?'About '+m[2]+' g, estimated from the photo':''));}});
+  return{name:'Meal',items:items,q:items.some(i=>i.conf<.3)?'Some foods weren’t in the food table. Check the amounts.':''};}
 function norm(r){return((r&&r.items)||[]).map(x=>{const p=+x.p||0,c=+x.c||0,f=+x.f||0,a=4*p+4*c+9*f;let k=+x.k||0;if(a>20&&Math.abs(k-a)/a>.15)k=(k+a)/2;const g=+x.g>0?+x.g:100;return{n:String(x.n||'Food'),u:'g',b:g,a:g,s:Math.round(g)+' g',k,p,c,f,conf:Math.max(0,Math.min(1,+x.conf||.7)),note:String(x.note||'')};});}
 const stt=()=>SC.r.items.reduce((t,i)=>{const q=i.a/i.b;t.k+=i.k*q;t.p+=i.p*q;t.c+=i.c*q;t.f+=i.f*q;t.w+=i.conf;return t;},{k:0,p:0,c:0,f:0,w:0});
 const cc=v=>v>=.8?'#2e7d32':v>=.6?'#e0a000':'var(--red)';
 function scOpen(m){SC.bc='';SC.m=m||'meal';SC.f=[];SC.u=[];SC.r=null;SC.note='';sh.classList.remove('hide');sh.scrollTop=0;scCap();(async()=>{try{SC.has=!!(window.claude&&await claude.use('sample'));}catch(e){SC.has=false;}if(!sh.classList.contains('hide')&&!SC.r&&!SC.busy&&document.activeElement!==$('scn'))scCap();})();}
 function scClose(){SC.id++;SC.busy=false;sh.classList.add('hide');}
 function scCap(){
-  const m=SC.m,tx=m==='text',key=ls.g('aiKey','');
+  const m=SC.m,tx=m==='text',ok2=!!(ls.g('aiUrl','')&&ls.g('aiTok',''));
   $('scv').innerHTML='<div class="chp">'+[['meal','Meal photo'],['label','Nutrition label'],['text','Describe']].map(x=>'<button data-m="'+x[0]+'" class="'+(x[0]===m?'on':'')+'">'+x[1]+'</button>').join('')+'</div>'+
   (tx?'':(SC.u.length?'<div class="th2">'+SC.u.map((u,i)=>'<div><img src="'+u+'" alt="Photo '+(i+1)+'"><button data-rm="'+i+'" aria-label="Remove photo">✕</button></div>').join('')+'</div>':'<div class="drop"><div>'+(m==='meal'?'Photograph your whole plate, bowl or drink.<br>Put a fork or your hand in the frame for scale.':'Photograph the Nutrition Facts panel.<br>Keep it flat, sharp and fully in frame.')+'</div></div>')+
   '<div class="vb"><button class="btn" data-cam="1">📷 Take photo</button><button class="btn" data-lib="1" style="background:var(--sv);color:var(--on)">Choose photos</button></div>')+
   '<div class="f"><label>'+(tx?'What did you eat?':'Anything we should know? (optional)')+'</label><textarea class="in" id="scn" style="min-height:'+(tx?110:64)+'px" placeholder="'+(tx?'e.g. 2 scrambled eggs, 1 slice sourdough with butter, black coffee':'e.g. dressing on the side, ate half, cooked in olive oil')+'">'+esc(SC.note)+'</textarea></div>'+
   '<button class="btn" id="scgo" data-go="1" style="width:calc(100% - 32px)"'+(scOk()?'':' disabled')+'>Analyze</button>'+
-  (SC.has?'':'<div class="card" style="margin-top:14px"><b>'+(key?'Using your Anthropic API key':'Connect AI')+'</b><div class="mut" style="margin:4px 0 10px">Scans run on Claude. Outside the Claude viewer, add your own API key. It stays on this device.</div>'+(key?'<button class="btn2" data-rk="1">Remove key</button>':'<input class="in" id="sck" type="password" placeholder="sk-ant-…" autocomplete="off"><button class="btn2" data-sk="1" style="margin-top:8px">Save key</button>')+'</div>')+
+  ('<div class="card" style="margin-top:14px"><b>On-device AI</b><div class="mut" id="aist" style="margin:4px 0 10px">'+aiStatus()+'</div>'+(AI.ready?'':'<button class="btn2" data-dl="1">Download food model</button>')+'</div>')+
   '<div class="mut" style="padding:12px 20px;font-size:12px">Estimates from photos can be off by 10–20%. Adjust portions on the next screen.</div>';
 }
 const scOk=()=>SC.m==='text'?SC.note.trim().length>2:SC.f.length>0;
@@ -1192,7 +1375,7 @@ async function run(fix){
     const items=norm(r);
     if(!items.length){toast(m==='label'?'Couldn’t read that label. Try a sharper, closer photo.':'No food found. Try a clearer photo or describe it.');SC.r=null;return scCap();}
     SC.r={name:String(r.name||'Meal'),items,q:String(r.q||'')};scRes();
-  }catch(e){if(id!==SC.id)return;toast(e&&e.code==='no_ai'?'Connect AI first. Add an API key below.':e&&e.code==='not_granted'?'Permission to use AI was declined.':e&&e.message&&e.code==='http'?e.message:'Couldn’t analyze that. Try again.');SC.r?scRes():scCap();}
+  }catch(e){if(id!==SC.id)return;toast(e&&e.code==='not_granted'?'Permission to use AI was declined.':e&&e.message&&e.code==='http'?e.message:'Couldn’t analyze that. Try again.');SC.r?scRes():scCap();}
   finally{clearInterval(tk);if(id===SC.id)SC.busy=false;}
 }
 function scRes(){
@@ -1200,7 +1383,7 @@ function scRes(){
   $('scv').innerHTML='<div class="hero">'+(img?'<img src="'+img+'" alt="Your meal">':'')+'<div class="ov" style="'+(img?'':'position:static;background:none;padding:22px 18px')+'"><div style="opacity:.8;font-size:13px">'+esc(r.name)+'</div><div><b style="font-size:46px;letter-spacing:-.02em;font-variant-numeric:tabular-nums">'+Math.round(t.k)+'</b> kcal</div><div style="font-size:13px;opacity:.85">Likely '+lo+'–'+hi+' · <span class="dot" style="margin:0 4px 0 0;background:'+cc(av)+'"></span>'+(av>=.8?'High':av>=.6?'Medium':'Low')+' confidence</div><div style="font-size:14px;margin-top:6px">Protein '+Math.round(t.p)+' g · Carbs '+Math.round(t.c)+' g · Fat '+Math.round(t.f)+' g</div></div></div>'+
   r.items.map((i,x)=>{const q=i.a/i.b;return '<div class="sp" style="cursor:default;flex-wrap:wrap"><div class="sm"><div>'+esc(i.n)+'<span class="dot" style="background:'+cc(i.conf)+'"></span></div><div class="mut">'+(i.note?esc(i.note)+' · ':'')+'P'+Math.round(i.p*q)+' C'+Math.round(i.c*q)+' F'+Math.round(i.f*q)+'</div></div><b style="font-size:18px">'+Math.round(i.k*q)+'</b><button class="ib" data-del="'+x+'" aria-label="Remove '+esc(i.n)+'" style="width:32px;height:32px">✕</button><div class="stp" style="width:100%;justify-content:flex-end"><button data-st="'+x+'" data-d="-1" aria-label="Less">−</button><input class="in" data-am="'+x+'" type="number" inputmode="decimal" aria-label="Amount" value="'+r1(i.a)+'"><span class="mut">'+(i.u==='g'?'g':'× '+esc(i.s))+'</span><button data-st="'+x+'" data-d="1" aria-label="More">+</button></div></div>';}).join('')+
   '<div style="margin:4px 16px 8px"><button class="btn2" data-add="1">+ Add an item</button></div><div id="scq0" class="hide"><div class="f"><input class="in" id="scq" type="search" placeholder="Search foods"></div><div id="scr"></div></div>'+
-  '<div class="f" style="margin-top:6px"><label>'+(r.q?'Claude asks: '+esc(r.q):'Something off? Tell Claude what it missed')+'</label><div class="g2" style="grid-template-columns:1fr auto"><input class="in" id="scx" placeholder="e.g. that’s brown rice, 2 tbsp dressing"><button class="btn2" data-fix="1">Re-analyze</button></div></div>'+
+  '<div class="f" style="margin-top:6px"><label>'+(r.q?'Check: '+esc(r.q):'Something off? Add what it missed')+'</label><div class="g2" style="grid-template-columns:1fr auto"><input class="in" id="scx" placeholder="e.g. that’s brown rice, 2 tbsp dressing"><button class="btn2" data-fix="1">Re-analyze</button></div></div>'+
   '<div class="f"><label>Add to</label><select id="scm">'+M.map(x=>'<option'+(x===$('fm').value?' selected':'')+'>'+x+'</option>').join('')+'</select></div>'+
   '<button class="btn" data-log="1" style="width:calc(100% - 32px)">Log '+Math.round(t.k)+' kcal</button>';
 }
@@ -1209,13 +1392,14 @@ function scLog(){const k=dk(day),m=$('scm').value,t=stt();(L[k]=L[k]||[]);
   SC.r.items.forEach(i=>{const q=i.a/i.b;L[k].push({n:i.n,s:i.u==='g'?Math.round(i.a)+' g':(i.a===1?'':r1(i.a)+' × ')+i.s,k:i.k*q,p:i.p*q,c:i.c*q,f:i.f*q,m});});
   if(SC.bc&&SC.r.items.length===1){const i=SC.r.items[0];BC[SC.bc]={n:i.n,s:Math.round(i.b)+' g',sg:i.b,k:i.k,p:i.p,c:i.c,f:i.f};}
   sv();scClose();$('fs').classList.add('hide');pend='';render();toast('Logged '+SC.r.items.length+' item'+(SC.r.items.length>1?'s':'')+' · '+Math.round(t.k)+' kcal');}
-sh.onclick=e=>{const t=e.target.closest('[data-m],[data-cam],[data-lib],[data-rm],[data-go],[data-sk],[data-rk],[data-del],[data-st],[data-add],[data-pk],[data-fix],[data-log]');if(!t||t.disabled)return;const d=t.dataset,it=SC.r&&SC.r.items;
+sh.onclick=e=>{const t=e.target.closest('[data-m],[data-cam],[data-lib],[data-rm],[data-go],[data-sk],[data-rk],[data-del],[data-st],[data-add],[data-pk],[data-fix],[data-log],[data-dl]');if(!t||t.disabled)return;const d=t.dataset,it=SC.r&&SC.r.items;
   if(d.m){SC.m=d.m;SC.f=[];SC.u=[];scCap();}
   else if(d.cam!=null)$('sci1').click();else if(d.lib!=null)$('sci2').click();
   else if(d.rm!=null){SC.f.splice(+d.rm,1);SC.u.splice(+d.rm,1);scCap();}
   else if(d.go!=null)run();
-  else if(d.sk!=null){const v=($('sck').value||'').trim();if(v){ls.s('aiKey',v);scCap();toast('Key saved on this device.');}}
-  else if(d.rk!=null){ls.s('aiKey','');scCap();}
+  else if(d.dl!=null){t.disabled=true;aiLoad().then(()=>{toast('Food model ready.');scCap();}).catch(e=>{t.disabled=false;toast(e&&e.message||'Download failed. Try again on Wi-Fi.');});}
+  else if(d.sk!=null){const u=($('sck').value||'').trim(),k=($('sck2').value||'').trim();if(/^https:\/\//.test(u)&&k){ls.s('aiUrl',u);ls.s('aiTok',k);scCap();toast('Connected.');}else toast('Enter your https:// server address and access code.');}
+  else if(d.rk!=null){ls.s('aiUrl','');ls.s('aiTok','');scCap();}
   else if(d.del!=null){it.splice(+d.del,1);it.length?scRes():(SC.r=null,scCap());}
   else if(d.st!=null){const i=it[+d.st],g=i.u==='g',step=g?Math.max(5,Math.round(i.a*.1/5)*5):.25;i.a=Math.max(g?5:.25,i.a+step*d.d);scRes();}
   else if(d.add!=null){$('scq0').classList.toggle('hide');if(!$('scq0').classList.contains('hide')){scList();$('scq').focus();}}
@@ -1229,5 +1413,6 @@ $('scb').onclick=()=>{if(SC.r&&!SC.busy){SC.r=null;scCap();}else scClose();};
 $('ps2').onclick=()=>scOpen('meal');
 })();
 </script>
+<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
 </body>
 </html>
