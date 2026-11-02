@@ -1375,7 +1375,7 @@ async function run(fix){
     const items=norm(r);
     if(!items.length){toast(m==='label'?'Couldn’t read that label. Try a sharper, closer photo.':'No food found. Try a clearer photo or describe it.');SC.r=null;return scCap();}
     SC.r={name:String(r.name||'Meal'),items,q:String(r.q||'')};scRes();
-  }catch(e){if(id!==SC.id)return;toast(e&&e.code==='not_granted'?'Permission to use AI was declined.':e&&e.message&&e.code==='http'?e.message:'Couldn’t analyze that. Try again.');SC.r?scRes():scCap();}
+  }catch(e){console.error(e);if(id!==SC.id)return;toast(e&&e.code==='not_granted'?'Permission to use AI was declined.':e&&e.message&&e.code==='http'?e.message:'Scan failed: '+String(e&&e.message||e).slice(0,140));SC.r?scRes():scCap();}
   finally{clearInterval(tk);if(id===SC.id)SC.busy=false;}
 }
 function scRes(){
