@@ -1,7 +1,7 @@
 """Pulls your COROS activities (unofficial Training Hub API), encrypts them with your
 passphrase, and writes data/workouts.enc. The repo only ever contains ciphertext.
 Needs: pip install cryptography"""
-import os, json, base64, hashlib, urllib.request, urllib.parse, urllib.error
+import os, json, base64, hashlib, time, urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timezone, timedelta
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -41,18 +41,32 @@ def save(salt, data):
     json.dump({"v": 1, "salt": e(salt), "iv": e(iv), "ct": e(ct)}, open(OUT, "w"))
 
 
-def call(path, token=None, body=None, params=None):
+def call(path, token=None, body=None, params=None, tries=3):
     url = BASE + path + ("?" + urllib.parse.urlencode(params) if params else "")
-    req = urllib.request.Request(url, data=json.dumps(body).encode() if body is not None else None)
-    req.add_header("Content-Type", "application/json")
-    req.add_header("User-Agent", "Mozilla/5.0")
-    if token:
-        req.add_header("accesstoken", token)
-    try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            out = json.load(r)
-    except urllib.error.HTTPError as e:
-        raise SystemExit(f"COROS returned HTTP {e.code} for {path} (rate limit or blocked?)")
+    for i in range(tries):
+        req = urllib.request.Request(url, data=json.dumps(body).encode() if body is not None else None)
+        req.add_header("Content-Type", "application/json")
+        req.add_header("Accept", "application/json")
+        req.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124 Safari/537.36")
+        if token:
+            req.add_header("accesstoken", token)
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                out = json.load(r)
+            break
+        except urllib.error.HTTPError as e:
+            detail = e.read()[:200].decode("utf-8", "replace")
+            if e.code in (401, 403) and token:
+                raise ApiErr(f"{path}: HTTP {e.code} with stored token")  # stale token -> log in again
+            if e.code in (429, 500, 502, 503, 504) and i < tries - 1:
+                time.sleep(5 * (i + 1))
+                continue
+            raise SystemExit(f"COROS returned HTTP {e.code} for {path}: {detail!r} (rate limit, or COROS blocking GitHub's IPs?)")
+        except (urllib.error.URLError, TimeoutError) as e:
+            if i < tries - 1:
+                time.sleep(5 * (i + 1))
+                continue
+            raise SystemExit(f"Could not reach COROS ({BASE}): {e}")
     if out.get("result") != "0000":
         raise ApiErr(f"{path}: {out.get('message')} (result {out.get('result')})")
     return out
@@ -65,12 +79,14 @@ def login():
 
 
 def fetch(token, start_day):
+    # COROS wants both startDay and endDay, so first runs get a default look-back window
+    if not start_day:
+        days = int(os.environ.get("COROS_BACKFILL_DAYS") or 365)
+        start_day = (datetime.now() - timedelta(days=days)).strftime("%Y%m%d")
+    end_day = (datetime.now() + timedelta(days=1)).strftime("%Y%m%d")
     items, page = [], 1
     while True:
-        p = {"size": 200, "pageNumber": page, "modeList": ""}
-        if start_day:
-            p["startDay"] = start_day
-            p["endDay"] = (datetime.now() + timedelta(days=1)).strftime("%Y%m%d")
+        p = {"size": 200, "pageNumber": page, "modeList": "", "startDay": start_day, "endDay": end_day}
         d = call("/activity/query", token, params=p)["data"]
         items += d.get("dataList") or []
         if page >= int(d.get("totalPage") or 1):
@@ -116,7 +132,8 @@ def main():
     if token:
         try:
             items = fetch(token, sd)
-        except ApiErr:
+        except ApiErr as e:
+            print(f"Stored token rejected ({e}); logging in again")
             items = None  # token expired, log in again
     if items is None:
         try:
