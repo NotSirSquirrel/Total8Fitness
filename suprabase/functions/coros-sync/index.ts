@@ -105,7 +105,7 @@ function conv(a: any) {
 
 async function loadStore(uid: string) {
   const { data, error } = await admin.from("user_data").select("value").eq("user_id", uid).eq("key", "corosActs").maybeSingle();
-  if (error) throw new Fail(500, "Couldn’t read your saved workouts.");
+  if (error) { console.error("loadStore", error.code, error.message); throw new Fail(500, `Couldn’t read your saved workouts (${error.code ?? "?"}: ${error.message}).`); }
   try { return data ? JSON.parse(data.value) : { acts: {} }; } catch { return { acts: {} }; }
 }
 
@@ -138,7 +138,7 @@ async function syncNow(uid: string, link: { region: string; token: string }) {
     { user_id: uid, key: "corosActs", value: JSON.stringify({ acts, last: newest, updated }), updated_at: updated },
     { onConflict: "user_id,key" },
   );
-  if (error) throw new Fail(500, "Couldn’t save your workouts.");
+  if (error) { console.error("saveStore", error.code, error.message); throw new Fail(500, `Couldn’t save your workouts (${error.code ?? "?"}: ${error.message}).`); }
   await admin.from("coros_links").update({ last_sync_at: updated }).eq("user_id", uid);
   return { fetched: items.length, added, total: Object.keys(acts).length, updated };
 }
