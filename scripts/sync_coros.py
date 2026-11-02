@@ -1,13 +1,11 @@
-"""Pulls your COROS activities (unofficial Training Hub API), encrypts them with your
-passphrase, and writes data/workouts.enc. The repo only ever contains ciphertext.
-Needs: pip install cryptography"""
-import os, json, base64, hashlib, time, urllib.request, urllib.parse, urllib.error
+"""Pulls your COROS activities (unofficial Training Hub API) and stores them in your
+Supabase account (user_data table, key corosActs). No extra packages needed."""
+import os, json, hashlib, time, urllib.request, urllib.parse, urllib.error
 from datetime import datetime, timezone, timedelta
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-OUT = "data/workouts.enc"
-PASS = os.environ["DATA_PASSPHRASE"]
-ITER = 600000
+SB = os.environ["SUPABASE_URL"].rstrip("/")
+SKEY = os.environ["SUPABASE_SERVICE_KEY"]
+UID = os.environ["SUPABASE_USER_ID"]
 BASES = {"en": "https://teamapi.coros.com", "eu": "https://teameuapi.coros.com", "cn": "https://teamcnapi.coros.com"}
 BASE = os.environ.get("COROS_BASE_URL") or BASES.get(os.environ.get("COROS_REGION", "en"), BASES["en"])
 
@@ -16,29 +14,28 @@ class ApiErr(Exception):
     pass
 
 
-def key_for(salt):
-    return hashlib.pbkdf2_hmac("sha256", PASS.encode(), salt, ITER, 32)
+def sb(method, path, body=None):
+    req = urllib.request.Request(SB + "/rest/v1/" + path, method=method,
+                                 data=json.dumps(body).encode() if body is not None else None)
+    for h, v in {"apikey": SKEY, "Authorization": "Bearer " + SKEY, "Content-Type": "application/json",
+                 "Prefer": "resolution=merge-duplicates,return=representation"}.items():
+        req.add_header(h, v)
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            t = r.read()
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"Supabase HTTP {e.code}: {e.read()[:200]!r} (check SUPABASE_URL / SERVICE_KEY / USER_ID and that the SQL was run)")
+    return json.loads(t) if t else None
 
 
 def load():
-    if not os.path.exists(OUT):
-        return None, {"acts": {}}
-    f = json.load(open(OUT))
-    salt = base64.b64decode(f["salt"])
-    try:
-        pt = AESGCM(key_for(salt)).decrypt(base64.b64decode(f["iv"]), base64.b64decode(f["ct"]), None)
-    except Exception:
-        raise SystemExit("Could not decrypt data/workouts.enc. Did DATA_PASSPHRASE change? Delete the file to start over.")
-    return salt, json.loads(pt)
+    rows = sb("GET", f"user_data?user_id=eq.{UID}&key=eq.corosActs&select=value")
+    return json.loads(rows[0]["value"]) if rows else {"acts": {}}
 
 
-def save(salt, data):
-    salt = salt or os.urandom(16)  # salt is reused so a remembered key keeps working
-    iv = os.urandom(12)
-    ct = AESGCM(key_for(salt)).encrypt(iv, json.dumps(data, separators=(",", ":")).encode(), None)
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    e = lambda b: base64.b64encode(b).decode()
-    json.dump({"v": 1, "salt": e(salt), "iv": e(iv), "ct": e(ct)}, open(OUT, "w"))
+def save(data):
+    sb("POST", "user_data?on_conflict=user_id,key",
+       [{"user_id": UID, "key": "corosActs", "value": json.dumps(data, separators=(",", ":"))}])
 
 
 def call(path, token=None, body=None, params=None, tries=3):
@@ -123,7 +120,7 @@ def conv(a):
 
 
 def main():
-    salt, store = load()
+    store = load()
     dump = lambda s: json.dumps({k: v for k, v in s.items() if k != "updated"}, sort_keys=True)
     before = dump(store)
     last = store.get("last")
@@ -152,8 +149,8 @@ def main():
         print("No changes")
         return
     store["updated"] = datetime.now(timezone.utc).isoformat()
-    save(salt, store)
-    print("Saved", OUT)
+    save(store)
+    print("Saved to Supabase")
 
 
 main()
