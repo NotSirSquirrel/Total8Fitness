@@ -167,6 +167,28 @@ body.menu .tabs{transform:none}
 #sum .bb i{background:var(--hp)}#sum circle[stroke="var(--p)"]{stroke:var(--hp)}
 footer.bar{background:var(--fbg,#0d0d0d)}
 .btn,#meals .hd .ib,.tabs button.on,#lkm button.on{box-shadow:0 8px 20px var(--bsh,#00000030)}
+
+/* ---- food scan v2 */
+.chp{display:flex;gap:6px;margin:0 16px 12px;padding:4px;background:var(--sv);border-radius:999px}.chp button{flex:1;padding:10px 6px;border-radius:999px;font-size:13px;font-weight:600;color:var(--mut)}.chp button.on{background:var(--p);color:var(--onp)}
+.drop{margin:0 16px 12px;min-height:190px;border:1.5px dashed var(--ol);border-radius:28px;display:grid;place-items:center;text-align:center;color:var(--mut);padding:22px;font-size:14px}
+.th2{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin:0 16px 12px}.th2 div{position:relative;aspect-ratio:1;border-radius:18px;overflow:hidden}.th2 img{width:100%;height:100%;object-fit:cover;display:block}.th2 button{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;background:#000a;color:#fff;font-size:12px}
+.hero{position:relative;margin:0 16px 12px;border-radius:28px;overflow:hidden;background:#242220;color:#fff;min-height:150px}.hero img{width:100%;max-height:280px;object-fit:cover;display:block}.hero .ov{position:absolute;inset:auto 0 0;padding:44px 18px 16px;background:linear-gradient(transparent,#000d)}
+.scl{position:absolute;left:0;right:0;height:3px;background:var(--p);box-shadow:0 0 18px 4px var(--p);animation:sw 1.8s ease-in-out infinite alternate}@keyframes sw{from{top:4%}to{top:96%}}
+@media (prefers-reduced-motion:reduce){.scl{animation:none;top:50%}}
+.stp{display:flex;align-items:center;gap:6px}.stp button{width:34px;height:34px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 1.5px var(--ol);font-size:18px}.stp input{width:72px;text-align:center;padding:7px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:7px}
+#sc .btn:disabled{opacity:.45;box-shadow:none}#sc textarea{width:100%}
+
+/* ---- barcode scanner v2 */
+#bc{background:#000;color:#fff;overflow:hidden;z-index:26;padding:0}
+#bcv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bcf{position:absolute;left:50%;top:36%;width:80%;max-width:360px;aspect-ratio:2/1;transform:translate(-50%,-50%);border-radius:22px;border:2.5px solid #fff;box-shadow:0 0 0 100vmax #0008}
+.bcf i{position:absolute;left:8%;right:8%;height:2px;background:#ff3b30;box-shadow:0 0 10px #ff3b30;animation:bsw 1.6s ease-in-out infinite alternate}@keyframes bsw{from{top:15%}to{top:85%}}
+@media (prefers-reduced-motion:reduce){.bcf i{animation:none;top:50%}}
+.bct{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);left:12px;right:12px;display:flex;justify-content:space-between}
+.bct .ib{background:#0009;color:#fff}
+.bcn{position:absolute;left:0;right:0;bottom:0;padding:40px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(transparent,#000d 35%)}
+.bcn .in{background:#ffffff1f;border-color:#ffffff40;color:#fff}.bcn .btn2{background:#ffffff26;color:#fff;box-shadow:none}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
@@ -239,6 +261,10 @@ footer.bar{background:var(--fbg,#0d0d0d)}
   </div>
   <input id="fi" type="file" accept="image/*" capture="environment" class="hide">
 </div>
+
+<div id="sc" class="sheet hide" style="z-index:25"><header><button class="ib" id="scb" aria-label="Back"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1>Scan food</h1><span style="width:44px"></span></header><div id="scv"></div><input id="sci1" type="file" accept="image/*" capture="environment" class="hide"><input id="sci2" type="file" accept="image/*" multiple class="hide"></div>
+
+<div id="bc" class="sheet hide"><video id="bcv" playsinline muted></video><div class="bcf"><i></i></div><div class="bct"><button class="ib" id="bcb" aria-label="Close scanner"><svg viewBox="0 0 24 24" width="26" height="26"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button><button class="ib hide" id="bct" aria-label="Flashlight"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M7 2h10v4l-2 3v13H9V9L7 6z"/></svg></button></div><div class="bcn"><div id="bcst" style="text-align:center;font-weight:600;margin-bottom:12px" role="status">Point at a barcode</div><div class="g2" style="grid-template-columns:1fr auto"><input class="in" id="bcm" inputmode="numeric" placeholder="Or type the number"><button class="btn2" id="bcg2">Look up</button></div><div style="text-align:center;margin-top:10px"><button class="btn2" id="bcp">Scan from a photo</button></div></div></div>
 
 <div id="ban">Ready</div>
 <div id="esc" class="hide" style="padding:8px 12px;background:var(--sv);font-size:13px">Optional: copy this address into a new Safari tab. The camera may work there, but two-phone pairing won’t.<input id="escu" readonly style="width:100%;margin-top:6px;font-size:12px;padding:6px;border-radius:8px;border:1px solid var(--ol);background:var(--bg);color:var(--on)"></div>
@@ -955,13 +981,13 @@ function list(arr,title){
 $('fsq').oninput=()=>list();
 $('fl').onclick=e=>{const r=e.target.closest('[data-i]');if(r)pick(shown[+r.dataset.i]);};
 $('fback').onclick=()=>{if(!$('fq').classList.contains('hide'))return back2list();stopScan();pend='';$('fs').classList.add('hide');};
-const qv=()=>Math.max(.05,+$('qn').value||1);
+const gm=()=>$('qu')&&$('qu').value==='g'&&sel&&sel.sg,qv=()=>{const v=Math.max(.05,+$('qn').value||1);return gm()?v/sel.sg:v;};
 function qt(){const q=qv(),f=sel;$('qt').innerHTML='<b style="font-size:22px">'+Math.round(f.k*q)+' kcal</b><div class="mut">Protein '+r1(f.p*q)+' g · Carbs '+r1(f.c*q)+' g · Fat '+r1(f.f*q)+' g</div>'+(f.x?'<div class="mut">Fiber '+r1(f.x.fi*q)+' g · Sugar '+r1(f.x.su*q)+' g · Sodium '+Math.round(f.x.na*q)+' mg</div>':'');}
 function pick(f){sel=f;stopScan();$('fmain').classList.add('hide');$('fq').classList.remove('hide');
-  $('fq').innerHTML='<b style="font-size:19px">'+esc(f.n)+'</b><div class="mut">per '+esc(f.s)+'</div><div class="f" style="padding:10px 0"><label>Servings</label><input class="in" id="qn" type="number" min="0.25" step="0.25" value="1" inputmode="decimal"></div><div id="qt"></div><div class="vb"><button class="btn" data-q="ok">Add to log</button><button class="btn" data-q="no" style="background:var(--sv);color:var(--on)">Cancel</button></div>';qt();}
-$('fq').oninput=qt;
+  $('fq').innerHTML='<div style="display:flex;gap:12px;align-items:center">'+(f.img?'<img src="'+esc(f.img)+'" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:14px;background:var(--bg)">':'')+'<div><b style="font-size:19px">'+esc(f.n)+'</b><div class="mut">per '+esc(f.s)+(f.ng?' · Nutri-Score '+esc(f.ng.toUpperCase()):'')+'</div></div></div><div class="f" style="padding:10px 0"><label>Amount</label><div class="g2" style="grid-template-columns:1fr 1fr"><input class="in" id="qn" type="number" min="0.25" step="0.25" value="1" inputmode="decimal">'+(f.sg?'<select class="in" id="qu"><option value="s">Servings</option><option value="g">Grams</option></select>':'<span class="mut" style="align-self:center">servings</span>')+'</div></div><div id="qt"></div><div class="vb"><button class="btn" data-q="ok">Add to log</button><button class="btn" data-q="no" style="background:var(--sv);color:var(--on)">Cancel</button></div>';qt();}
+$('fq').oninput=qt;$('fq').onchange=e=>{if(e.target.id==='qu'){$('qn').value=e.target.value==='g'?sel.sg:1;qt();}};
 $('fq').onclick=e=>{const a=e.target.dataset.q;if(a==='no')back2list();
-  else if(a==='ok'){const q=qv(),f=sel,k=dk(day);(L[k]=L[k]||[]).push({n:f.n,s:(q===1?'':q+' × ')+f.s,k:f.k*q,p:f.p*q,c:f.c*q,f:f.f*q,m:$('fm').value});
+  else if(a==='ok'){const q=qv(),f=sel,k=dk(day);(L[k]=L[k]||[]).push({n:f.n,s:gm()?Math.round(q*f.sg)+' g':(q===1?'':r1(q)+' × ')+f.s,k:f.k*q,p:f.p*q,c:f.c*q,f:f.f*q,m:$('fm').value});
     RC=[f,...RC.filter(x=>x.n!==f.n||x.s!==f.s)].slice(0,8);if(pend){BC[pend]=f;pend='';}sv();$('fs').classList.add('hide');render();toast('Added '+f.n);}};
 $('bn').onclick=()=>$('fc').classList.toggle('hide');
 $('cs').onclick=()=>{const g=i=>$(i).value,n=g('cn').trim();if(!n)return toast('Enter a name first.');
@@ -970,13 +996,14 @@ $('cs').onclick=()=>{const g=i=>$(i).value,n=g('cn').trim();if(!n)return toast('
 
 // ----- barcode
 function stopScan(){clearInterval(tm);if(bs)bs.getTracks().forEach(t=>t.stop());bs=null;$('fcam').classList.add('hide');}
-async function lookup(c){try{const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(c)+'.json?fields=product_name,brands,serving_size,nutriments',{signal:AbortSignal.timeout(8000)});if(!r.ok)return null;const j=await r.json();if(j.status!==1||!j.product)return null;
-  const p=j.product,n=p.nutriments||{},sv=n['energy-kcal_serving']!=null,x=sv?'_serving':'_100g',g=k=>+n[k+x]||0,name=((p.brands?p.brands.split(',')[0]+' ':'')+(p.product_name||'')).trim();if(!name)return null;
-  return{n:name,s:sv?(p.serving_size||'1 serving'):'100 g',k:+n['energy-kcal'+x]||(+n['energy'+x]/4.184)||0,p:g('proteins'),c:g('carbohydrates'),f:g('fat'),x:{fi:g('fiber'),su:g('sugars'),na:g('sodium')*1000}};}catch(e){return null;}}
+async function lookup(c,t){try{const r=await fetch('https://world.openfoodfacts.org/api/v2/product/'+encodeURIComponent(c)+'.json?fields=product_name,brands,serving_size,serving_quantity,nutriments,image_front_small_url,nutriscore_grade',{signal:AbortSignal.timeout(8000)});if(!r.ok)return null;const j=await r.json();
+  if(j.status!==1||!j.product)return(!t&&c.length===12)?lookup('0'+c,1):null;
+  const p=j.product,n=p.nutriments||{},ps=n['energy-kcal_serving']!=null,x=ps?'_serving':'_100g',g=k=>+n[k+x]||0,name=((p.brands?p.brands.split(',')[0]+' ':'')+(p.product_name||'')).trim();if(!name)return null;
+  return{n:name,s:ps?(p.serving_size||'1 serving'):'100 g',sg:ps?(+p.serving_quantity||0):100,img:p.image_front_small_url||'',ng:p.nutriscore_grade||'',k:+n['energy-kcal'+x]||(+n['energy'+x]/4.184)||0,p:g('proteins'),c:g('carbohydrates'),f:g('fat'),x:{fi:g('fiber'),su:g('sugars'),na:g('sodium')*1000}};}catch(e){return null;}}
 async function code(c){stopScan();const f=BC[c];if(f){toast('Found '+f.n);return pick(f);}
   $('fst').textContent='Looking up '+c+'…';const o=await lookup(c);
   if(o){pend=c;toast('Found '+o.n);return pick(o);}
-  pend=c;list();toast('Not found online. Pick the food it belongs to.');}
+  pend=c;nf(c);}
 async function live(){
   if(!('BarcodeDetector' in window)||!navigator.mediaDevices)return false;
   try{bs=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});const v=$('bv');v.srcObject=bs;await v.play();const d=new BarcodeDetector();
@@ -987,14 +1014,31 @@ async function dec(file){
   if('BarcodeDetector' in window){const r=await new BarcodeDetector().detect(await createImageBitmap(file));if(r[0])return r[0].rawValue;}
   await loadZ();const u=URL.createObjectURL(file);try{return (await new ZXing.BrowserMultiFormatReader().decodeFromImageUrl(u)).getText();}finally{URL.revokeObjectURL(u);}
 }
-$('bs').onclick=async()=>{$('fc').classList.add('hide');$('fcam').classList.remove('hide');const ok=await live();$('bv').parentNode.style.display=ok?'':'none';if(!ok)toast('Live scan isn’t available here. Take a photo of the barcode or type the number.');};
+const eanOk=c=>{if(!/^(\d{8}|\d{12,14})$/.test(c))return true;const d=[...c].map(Number),k=d.pop();let t=0;d.reverse().forEach((x,i)=>t+=x*(i%2?1:3));return(10-t%10)%10===k;};
+let bcS=null,bcR=null,bcT=0,bcLock=false,bcOn=false;
+function bcStop(){clearInterval(bcT);try{bcR&&bcR.reset();}catch(e){}bcR=null;const v=$('bcv'),st=v.srcObject||bcS;if(st)st.getTracks().forEach(t=>t.stop());v.srcObject=null;bcS=null;$('bct').classList.add('hide');bcOn=false;}
+function bcClose(){bcStop();$('bc').classList.add('hide');}
+async function bcHit(c){if(bcLock||!eanOk(c))return;bcLock=true;if(navigator.vibrate)navigator.vibrate(60);$('bcv').pause();$('bcst').textContent='Found '+c+' · looking it up…';try{await code(c);}finally{bcClose();}}
+async function bcOpen(){$('fc').classList.add('hide');$('bc').classList.remove('hide');bcLock=false;$('bcst').textContent='Point at a barcode';bcStop();const v=$('bcv'),cons={video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false};
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia)throw 0;
+    if('BarcodeDetector' in window){const det=new BarcodeDetector();bcS=await navigator.mediaDevices.getUserMedia(cons);v.srcObject=bcS;await v.play();bcT=setInterval(async()=>{if(bcLock||v.readyState<2)return;try{const r=await det.detect(v);if(r[0])bcHit(r[0].rawValue);}catch(e){}},200);}
+    else{await loadZ();const h=new Map(),F=ZXing.BarcodeFormat;h.set(ZXing.DecodeHintType.POSSIBLE_FORMATS,[F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39,F.ITF]);h.set(ZXing.DecodeHintType.TRY_HARDER,true);bcR=new ZXing.BrowserMultiFormatReader(h,150);await bcR.decodeFromConstraints(cons,v,r=>{if(r)bcHit(r.getText());});bcS=v.srcObject;}
+    bcOn=true;const tr=(bcS||v.srcObject).getVideoTracks()[0],cp=tr.getCapabilities?tr.getCapabilities():{};if(cp.torch)$('bct').classList.remove('hide');
+  }catch(e){$('bcst').textContent='Camera unavailable. Type the number or scan from a photo.';}
+}
+$('bct').onclick=async()=>{const tr=bcS&&bcS.getVideoTracks()[0];if(!tr)return;bcOn=!bcOn;try{await tr.applyConstraints({advanced:[{torch:bcOn}]});}catch(e){}};
+$('bs').onclick=bcOpen;$('bcb').onclick=bcClose;
+$('bcg2').onclick=()=>{const c=$('bcm').value.trim();if(c){bcLock=false;bcHit(c.replace(/\D/g,'')||c);}};$('bcm').onkeydown=e=>{if(e.key==='Enter')$('bcg2').click();};
+$('bcp').onclick=()=>{bcClose();mode='bc';$('fi').click();};
+function nf(c){$('fst').textContent='';$('fmain').classList.add('hide');$('fq').classList.remove('hide');$('fq').innerHTML='<b style="font-size:19px">Not in the database yet</b><div class="mut" style="margin:4px 0 12px">Barcode '+esc(c)+' wasn’t found. Add it once and it scans instantly next time.</div><div class="vb"><button class="btn" data-nf="l">Scan its nutrition label</button><button class="btn" data-nf="m" style="background:var(--sv);color:var(--on)">Enter manually</button></div><div style="margin-top:8px"><button class="btn2" data-nf="s">Search foods instead</button></div>';}
+$('fq').addEventListener('click',e=>{const a=e.target.dataset.nf;if(a==='l'){scOpen('label');SC.bc=pend;}else if(a==='m'){back2list();$('fc').classList.remove('hide');}else if(a==='s'){back2list();list();}});
 $('bph').onclick=()=>{mode='bc';$('fi').click();};
-$('ps2').onclick=()=>{mode='ai';$('fi').click();};
+
 $('bcg').onclick=()=>{const v=$('bcn').value.trim();if(v)code(v);};
 $('bcx').onclick=stopScan;
 $('fi').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
-  if(mode==='ai')return ai(f);
-  try{code(await dec(f));}catch(x){toast('Couldn’t read that barcode. Try a closer, sharper photo or type the number.');}};
+    try{code(await dec(f));}catch(x){toast('Couldn’t read that barcode. Try a closer, sharper photo or type the number.');}};
 
 // ----- workouts database (Garmin / Coros import)
 let WO=ls.g('calWo',[]);
@@ -1103,20 +1147,86 @@ $('wlk').onclick=()=>{ls.s('calKey',null);skey=null;WO=WO.filter(w=>!w.sid);ls.s
 (async()=>{sfile=await getFile();if(!sfile||!window.crypto||!crypto.subtle)return;const ck=ls.g('calKey',null);if(ck&&ck.salt===sfile.salt){try{await loadSync(await crypto.subtle.importKey('raw',b64(ck.k),'AES-GCM',false,['decrypt']),sfile);return;}catch(e){}}$('lk').classList.remove('hide');})();
 
 tab(2);
-// ----- scan food with Claude
-async function ai(file){
+// ----- scan food: meal photo / nutrition label / description
+const AIM='claude-sonnet-5-5',SC={m:'meal',f:[],u:[],r:null,id:0,note:'',has:false,ah:[]},sh=$('sc');
+const SYS=`You are a registered dietitian who is expert at judging portion sizes from photos. Return ONLY JSON, no prose: {"name":"short meal name","items":[{"n":"food name","g":grams or ml actually eaten,"k":kcal,"p":protein g,"c":carbs g,"f":fat g,"conf":0 to 1,"note":"short assumption, e.g. about 1 cup cooked rice"}],"q":"one short question only if an unknown would change calories by 15% or more, else empty"}.
+Rules: list every food and drink separately. Estimate weight from scale cues (a dinner plate is about 26 cm, forks, hands, cups, cans, packaging). Use cooked weights. Include cooking oil, butter, dressings and sauces that are likely present. Be realistic and do not undercount restaurant food. Calories must agree with macros (4 kcal per g protein and carbs, 9 per g fat). Ignore non-food. If no food is visible return {"items":[]}.`;
+const SYSL=`You read Nutrition Facts labels. Return ONLY JSON: {"name":"product name","items":[{"n":"product name","g":serving size in grams or ml,"k":kcal per serving,"p":protein g,"c":carbs g,"f":fat g,"conf":legibility 0 to 1,"note":"e.g. 8 servings per container"}],"q":""}. Use exactly one serving as printed. If the label is unreadable return {"items":[]}.`;
+const tob64=b=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(',')[1]);x.readAsDataURL(b);});
+async function prep(f){const bm=await createImageBitmap(f,{imageOrientation:'from-image'}),k=Math.min(1,1280/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*k);c.height=Math.round(bm.height*k);c.getContext('2d').drawImage(bm,0,0,c.width,c.height);return new Promise(r=>c.toBlob(r,'image/jpeg',.82));}
+async function ask(sys,txt,bl){
   let s=null;try{s=window.claude&&await claude.use('sample');}catch(e){}
-  if(!s)return toast('Food photo scan isn’t available in this view.');
-  $('fst').textContent='Analyzing your photo…';
-  try{
-    const bm=await createImageBitmap(file),sc=Math.min(1,800/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*sc);c.height=Math.round(bm.height*sc);
-    c.getContext('2d').drawImage(bm,0,0,c.width,c.height);
-    const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.8));
-    const r=await s.json('You are a nutrition estimator. Identify every food and drink in this photo and estimate the portion shown. Return ONLY JSON: {"items":[{"n":"name","s":"portion, e.g. 1 cup or 150 g","k":calories,"p":protein grams,"c":carb grams,"f":fat grams}]}. Use plain numbers for k, p, c, f.',{images:[b]});
-    const a=((r&&r.items)||[]).map(x=>({n:String(x.n),s:String(x.s),k:+x.k||0,p:+x.p||0,c:+x.c||0,f:+x.f||0}));
-    if(a.length)list(a,'Estimated from your photo. Tap an item to adjust and add. Estimates can be off.');else{toast('No food found in that photo.');$('fst').textContent='';}
-  }catch(e){toast(e&&e.code==='not_granted'?'Permission to use AI was declined.':'Couldn’t analyze that photo.');$('fst').textContent='';}
+  if(s){try{const lim=s.limits?await s.limits():{images:true};if(!bl.length||lim.images)return await s.json(sys+'\n\n'+txt,bl.length?{images:bl,modelTier:'complex'}:{modelTier:'complex'});}catch(e){if(!ls.g('aiKey',''))throw e;}}
+  const key=ls.g('aiKey','');if(!key)throw{code:'no_ai'};
+  const content=[];for(const b of bl)content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await tob64(b)}});content.push({type:'text',text:txt});
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:AIM,max_tokens:1500,system:sys,messages:[{role:'user',content}]})});
+  if(!r.ok)throw{code:'http',message:r.status===401?'That API key was rejected.':'AI request failed ('+r.status+').'};
+  const t=(await r.json()).content.map(x=>x.text||'').join('');return JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1));
 }
+function norm(r){return((r&&r.items)||[]).map(x=>{const p=+x.p||0,c=+x.c||0,f=+x.f||0,a=4*p+4*c+9*f;let k=+x.k||0;if(a>20&&Math.abs(k-a)/a>.15)k=(k+a)/2;const g=+x.g>0?+x.g:100;return{n:String(x.n||'Food'),u:'g',b:g,a:g,s:Math.round(g)+' g',k,p,c,f,conf:Math.max(0,Math.min(1,+x.conf||.7)),note:String(x.note||'')};});}
+const stt=()=>SC.r.items.reduce((t,i)=>{const q=i.a/i.b;t.k+=i.k*q;t.p+=i.p*q;t.c+=i.c*q;t.f+=i.f*q;t.w+=i.conf;return t;},{k:0,p:0,c:0,f:0,w:0});
+const cc=v=>v>=.8?'#2e7d32':v>=.6?'#e0a000':'var(--red)';
+function scOpen(m){SC.bc='';SC.m=m||'meal';SC.f=[];SC.u=[];SC.r=null;SC.note='';sh.classList.remove('hide');sh.scrollTop=0;scCap();(async()=>{try{SC.has=!!(window.claude&&await claude.use('sample'));}catch(e){SC.has=false;}if(!sh.classList.contains('hide')&&!SC.r&&!SC.busy&&document.activeElement!==$('scn'))scCap();})();}
+function scClose(){SC.id++;SC.busy=false;sh.classList.add('hide');}
+function scCap(){
+  const m=SC.m,tx=m==='text',key=ls.g('aiKey','');
+  $('scv').innerHTML='<div class="chp">'+[['meal','Meal photo'],['label','Nutrition label'],['text','Describe']].map(x=>'<button data-m="'+x[0]+'" class="'+(x[0]===m?'on':'')+'">'+x[1]+'</button>').join('')+'</div>'+
+  (tx?'':(SC.u.length?'<div class="th2">'+SC.u.map((u,i)=>'<div><img src="'+u+'" alt="Photo '+(i+1)+'"><button data-rm="'+i+'" aria-label="Remove photo">✕</button></div>').join('')+'</div>':'<div class="drop"><div>'+(m==='meal'?'Photograph your whole plate, bowl or drink.<br>Put a fork or your hand in the frame for scale.':'Photograph the Nutrition Facts panel.<br>Keep it flat, sharp and fully in frame.')+'</div></div>')+
+  '<div class="vb"><button class="btn" data-cam="1">📷 Take photo</button><button class="btn" data-lib="1" style="background:var(--sv);color:var(--on)">Choose photos</button></div>')+
+  '<div class="f"><label>'+(tx?'What did you eat?':'Anything we should know? (optional)')+'</label><textarea class="in" id="scn" style="min-height:'+(tx?110:64)+'px" placeholder="'+(tx?'e.g. 2 scrambled eggs, 1 slice sourdough with butter, black coffee':'e.g. dressing on the side, ate half, cooked in olive oil')+'">'+esc(SC.note)+'</textarea></div>'+
+  '<button class="btn" id="scgo" data-go="1" style="width:calc(100% - 32px)"'+(scOk()?'':' disabled')+'>Analyze</button>'+
+  (SC.has?'':'<div class="card" style="margin-top:14px"><b>'+(key?'Using your Anthropic API key':'Connect AI')+'</b><div class="mut" style="margin:4px 0 10px">Scans run on Claude. Outside the Claude viewer, add your own API key. It stays on this device.</div>'+(key?'<button class="btn2" data-rk="1">Remove key</button>':'<input class="in" id="sck" type="password" placeholder="sk-ant-…" autocomplete="off"><button class="btn2" data-sk="1" style="margin-top:8px">Save key</button>')+'</div>')+
+  '<div class="mut" style="padding:12px 20px;font-size:12px">Estimates from photos can be off by 10–20%. Adjust portions on the next screen.</div>';
+}
+const scOk=()=>SC.m==='text'?SC.note.trim().length>2:SC.f.length>0;
+async function run(fix){
+  const id=++SC.id,m=SC.m,img=SC.u[0];SC.busy=true;
+  const ms=m==='label'?['Reading the label…','Checking serving size…','Doing the math…']:['Spotting foods…','Judging portion sizes…','Counting hidden oils and sauces…','Adding it up…'];let i=0;
+  $('scv').innerHTML=(img&&m!=='text'?'<div class="hero"><img src="'+img+'" alt=""><i class="scl"></i></div>':'')+'<div id="scs" class="mut" style="text-align:center;padding:16px" role="status">'+ms[0]+'</div>';
+  const tk=setInterval(()=>{const e=$('scs');if(e)e.textContent=ms[++i%ms.length];},1800);
+  try{
+    const bl=m==='text'?[]:await Promise.all(SC.f.map(prep));
+    let txt=m==='text'?'Meal description: '+SC.note:(m==='label'?'Read this nutrition label.':'Analyze this meal.')+(SC.note?' Context from the person: '+SC.note:'');
+    if(fix&&SC.r)txt+='\nPrevious estimate: '+JSON.stringify(SC.r.items.map(x=>({n:x.n,g:Math.round(x.a),k:Math.round(x.k*x.a/x.b)})))+'\nCorrection from the person: '+fix+'\nReturn the full corrected JSON.';
+    const r=await ask(m==='label'?SYSL:SYS,txt,bl);if(id!==SC.id)return;
+    const items=norm(r);
+    if(!items.length){toast(m==='label'?'Couldn’t read that label. Try a sharper, closer photo.':'No food found. Try a clearer photo or describe it.');SC.r=null;return scCap();}
+    SC.r={name:String(r.name||'Meal'),items,q:String(r.q||'')};scRes();
+  }catch(e){if(id!==SC.id)return;toast(e&&e.code==='no_ai'?'Connect AI first. Add an API key below.':e&&e.code==='not_granted'?'Permission to use AI was declined.':e&&e.message&&e.code==='http'?e.message:'Couldn’t analyze that. Try again.');SC.r?scRes():scCap();}
+  finally{clearInterval(tk);if(id===SC.id)SC.busy=false;}
+}
+function scRes(){
+  const r=SC.r,t=stt(),n=r.items.length,av=n?t.w/n:0,sp=.07+(1-av)*.25,lo=Math.round(t.k*(1-sp)/10)*10,hi=Math.round(t.k*(1+sp)/10)*10,img=SC.m!=='text'&&SC.u[0];
+  $('scv').innerHTML='<div class="hero">'+(img?'<img src="'+img+'" alt="Your meal">':'')+'<div class="ov" style="'+(img?'':'position:static;background:none;padding:22px 18px')+'"><div style="opacity:.8;font-size:13px">'+esc(r.name)+'</div><div><b style="font-size:46px;letter-spacing:-.02em;font-variant-numeric:tabular-nums">'+Math.round(t.k)+'</b> kcal</div><div style="font-size:13px;opacity:.85">Likely '+lo+'–'+hi+' · <span class="dot" style="margin:0 4px 0 0;background:'+cc(av)+'"></span>'+(av>=.8?'High':av>=.6?'Medium':'Low')+' confidence</div><div style="font-size:14px;margin-top:6px">Protein '+Math.round(t.p)+' g · Carbs '+Math.round(t.c)+' g · Fat '+Math.round(t.f)+' g</div></div></div>'+
+  r.items.map((i,x)=>{const q=i.a/i.b;return '<div class="sp" style="cursor:default;flex-wrap:wrap"><div class="sm"><div>'+esc(i.n)+'<span class="dot" style="background:'+cc(i.conf)+'"></span></div><div class="mut">'+(i.note?esc(i.note)+' · ':'')+'P'+Math.round(i.p*q)+' C'+Math.round(i.c*q)+' F'+Math.round(i.f*q)+'</div></div><b style="font-size:18px">'+Math.round(i.k*q)+'</b><button class="ib" data-del="'+x+'" aria-label="Remove '+esc(i.n)+'" style="width:32px;height:32px">✕</button><div class="stp" style="width:100%;justify-content:flex-end"><button data-st="'+x+'" data-d="-1" aria-label="Less">−</button><input class="in" data-am="'+x+'" type="number" inputmode="decimal" aria-label="Amount" value="'+r1(i.a)+'"><span class="mut">'+(i.u==='g'?'g':'× '+esc(i.s))+'</span><button data-st="'+x+'" data-d="1" aria-label="More">+</button></div></div>';}).join('')+
+  '<div style="margin:4px 16px 8px"><button class="btn2" data-add="1">+ Add an item</button></div><div id="scq0" class="hide"><div class="f"><input class="in" id="scq" type="search" placeholder="Search foods"></div><div id="scr"></div></div>'+
+  '<div class="f" style="margin-top:6px"><label>'+(r.q?'Claude asks: '+esc(r.q):'Something off? Tell Claude what it missed')+'</label><div class="g2" style="grid-template-columns:1fr auto"><input class="in" id="scx" placeholder="e.g. that’s brown rice, 2 tbsp dressing"><button class="btn2" data-fix="1">Re-analyze</button></div></div>'+
+  '<div class="f"><label>Add to</label><select id="scm">'+M.map(x=>'<option'+(x===$('fm').value?' selected':'')+'>'+x+'</option>').join('')+'</select></div>'+
+  '<button class="btn" data-log="1" style="width:calc(100% - 32px)">Log '+Math.round(t.k)+' kcal</button>';
+}
+function scList(){const q=$('scq').value.trim().toLowerCase();SC.ah=[...CU,...D].filter(f=>!q||(f.n+' '+f.s).toLowerCase().includes(q)).slice(0,8);$('scr').innerHTML=SC.ah.map((f,i)=>'<div class="sp" data-pk="'+i+'"><div class="sm"><div>'+esc(f.n)+'</div><div class="mut">'+esc(f.s)+'</div></div><b>'+Math.round(f.k)+'</b></div>').join('');}
+function scLog(){const k=dk(day),m=$('scm').value,t=stt();(L[k]=L[k]||[]);
+  SC.r.items.forEach(i=>{const q=i.a/i.b;L[k].push({n:i.n,s:i.u==='g'?Math.round(i.a)+' g':(i.a===1?'':r1(i.a)+' × ')+i.s,k:i.k*q,p:i.p*q,c:i.c*q,f:i.f*q,m});});
+  if(SC.bc&&SC.r.items.length===1){const i=SC.r.items[0];BC[SC.bc]={n:i.n,s:Math.round(i.b)+' g',sg:i.b,k:i.k,p:i.p,c:i.c,f:i.f};}
+  sv();scClose();$('fs').classList.add('hide');pend='';render();toast('Logged '+SC.r.items.length+' item'+(SC.r.items.length>1?'s':'')+' · '+Math.round(t.k)+' kcal');}
+sh.onclick=e=>{const t=e.target.closest('[data-m],[data-cam],[data-lib],[data-rm],[data-go],[data-sk],[data-rk],[data-del],[data-st],[data-add],[data-pk],[data-fix],[data-log]');if(!t||t.disabled)return;const d=t.dataset,it=SC.r&&SC.r.items;
+  if(d.m){SC.m=d.m;SC.f=[];SC.u=[];scCap();}
+  else if(d.cam!=null)$('sci1').click();else if(d.lib!=null)$('sci2').click();
+  else if(d.rm!=null){SC.f.splice(+d.rm,1);SC.u.splice(+d.rm,1);scCap();}
+  else if(d.go!=null)run();
+  else if(d.sk!=null){const v=($('sck').value||'').trim();if(v){ls.s('aiKey',v);scCap();toast('Key saved on this device.');}}
+  else if(d.rk!=null){ls.s('aiKey','');scCap();}
+  else if(d.del!=null){it.splice(+d.del,1);it.length?scRes():(SC.r=null,scCap());}
+  else if(d.st!=null){const i=it[+d.st],g=i.u==='g',step=g?Math.max(5,Math.round(i.a*.1/5)*5):.25;i.a=Math.max(g?5:.25,i.a+step*d.d);scRes();}
+  else if(d.add!=null){$('scq0').classList.toggle('hide');if(!$('scq0').classList.contains('hide')){scList();$('scq').focus();}}
+  else if(d.pk!=null){const f=SC.ah[+d.pk];it.push({n:f.n,u:'x',b:1,a:1,s:f.s,k:f.k,p:f.p,c:f.c,f:f.f,conf:1,note:'Added by you'});scRes();}
+  else if(d.fix!=null){const v=$('scx').value.trim();if(v)run(v);else toast('Type what to fix first.');}
+  else if(d.log!=null)scLog();};
+sh.oninput=e=>{if(e.target.id==='scn'){SC.note=e.target.value;const g=$('scgo');if(g)g.disabled=!scOk();}else if(e.target.id==='scq')scList();};
+sh.onchange=e=>{const a=e.target.dataset.am;if(a!=null){const v=+e.target.value;if(v>0)SC.r.items[+a].a=v;scRes();}};
+$('sci1').onchange=$('sci2').onchange=e=>{const fs=[...e.target.files].slice(0,3-SC.f.length);e.target.value='';fs.forEach(f=>{SC.f.push(f);SC.u.push(URL.createObjectURL(f));});if(SC.f.length>3){SC.f.length=3;SC.u.length=3;}scCap();};
+$('scb').onclick=()=>{if(SC.r&&!SC.busy){SC.r=null;scCap();}else scClose();};
+$('ps2').onclick=()=>scOpen('meal');
 })();
 </script>
 </body>
