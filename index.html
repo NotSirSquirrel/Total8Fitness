@@ -203,7 +203,7 @@ body.locked>*:not(#vlock):not(script){display:none!important}
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#4558a9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
 <body class="locked">
-<div id="vlock"><form id="vlf"><div class="vli"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h1 id="vlt"></h1><div class="mut" id="vls"></div><input type="text" name="username" value="tracker" autocomplete="username" hidden><div class="vlr"><input class="in" id="vlp" type="password" placeholder="Passphrase" required><button type="button" class="btn2" id="vlsh">Show</button></div><input class="in" id="vlc" type="password" autocomplete="new-password" placeholder="Confirm passphrase"><label class="mut vlr" style="font-size:14px"><input type="checkbox" id="vlk"> Stay signed in on this device for 30 days</label><div id="vle" role="alert"></div><button class="btn" id="vlb" type="submit"></button><div class="mut" id="vlw" style="font-size:13px"></div><button type="button" class="btn2" id="vlx" style="align-self:center">Forgot it? Erase this device’s data</button></form></div>
+<div id="vlock"><form id="vlf"><h1 id="vlt"></h1><div class="mut" id="vls"></div><input class="in" id="vlm" type="email" placeholder="Email" autocomplete="email" required><input class="in" id="vlp" type="password" placeholder="Password (8+ characters)" autocomplete="current-password" required minlength="8"><div class="mut" id="vle" role="alert"></div><button class="btn" id="vlb"></button><button type="button" class="btn2" id="vlx"></button></form></div>
 
 <header>
   <button class="ib" id="back" aria-label="Clear"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
@@ -235,9 +235,9 @@ body.locked>*:not(#vlock):not(script){display:none!important}
 <main class="cv" id="wom">
   <div id="wds"></div><div class="card" id="whr"></div><div id="wcat"></div>
   
-  <div id="wsr" class="hide" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">↻ Sync Coros</button><button class="btn2" id="wlk">Lock</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
+  <div id="wsr" class="hide" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">↻ Sync Coros</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
   <div id="wfm" class="hide card"><div class="g2"><select class="in" id="w_t"><option>Run</option><option>Walk</option><option>Cycle</option><option>Swim</option><option>Hike</option><option>Strength</option><option>Other</option></select><input class="in" id="w_d" type="date"></div><input class="in" id="w_n" placeholder="Title (optional)" style="margin-top:6px"><div class="g2"><div><label class="mut" id="w_ml" style="font-size:12px">Distance (km)</label><input class="in" id="w_m" type="number" inputmode="decimal"></div><div><label class="mut" style="font-size:12px">Minutes</label><input class="in" id="w_s" type="number" inputmode="decimal"></div></div><div class="g2"><div><label class="mut" style="font-size:12px">Calories (blank = estimate)</label><input class="in" id="w_k" type="number" inputmode="numeric"></div><div><label class="mut" style="font-size:12px">Avg heart rate</label><input class="in" id="w_h" type="number" inputmode="numeric"></div></div><button class="btn" id="w_sv" style="margin:10px 0 0">Save workout</button></div>
-  <div class="card" id="wst"></div><div class="card" id="wmi"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
+  <div style="margin:0 12px 10px"><button class="btn2" id="wun"></button></div><div class="card" id="wst"></div><div class="card" id="wmi"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
   <div class="hd" style="display:flex;align-items:center;justify-content:space-between;position:relative">History<button class="ib" id="wmore" aria-label="More options" style="font-size:22px;color:var(--mut)">⋯</button><div id="wmenu" class="hide"><label>Import file<input id="wfi" type="file" multiple accept=".csv,.tcx,.gpx,.fit,.txt" class="hide"></label><button id="wadd">Add workout</button></div></div><div id="wlist"></div>
 </main>
 <div class="sheet hide" id="pf">
@@ -355,74 +355,43 @@ body.locked>*:not(#vlock):not(script){display:none!important}
 
 <script>
 (()=>{
-const $=id=>document.getElementById(id),E=new TextEncoder(),T=new TextDecoder(),M=new Map(),Q={};
-const b2=u=>{let s='';for(let i=0;i<u.length;i+=8192)s+=String.fromCharCode(...u.subarray(i,i+8192));return btoa(s);},u2=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-const MK='vault:meta',SK='vault:sess',KP='vault:keep',PF='v:',DAY=864e5,LOCK_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',SH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>';
-let KEY=null,meta=null,keep=false,fails=0,until=0;
-try{meta=JSON.parse(localStorage.getItem(MK)||'null');}catch(e){}
-const derive=async(pw,salt)=>{const km=await crypto.subtle.importKey('raw',E.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:600000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['encrypt','decrypt']);};
-const imp=raw=>crypto.subtle.importKey('raw',u2(raw),'AES-GCM',true,['encrypt','decrypt']);
-const rawOf=async k=>b2(new Uint8Array(await crypto.subtle.exportKey('raw',k)));
-const enc=async(s,k=KEY)=>{const iv=crypto.getRandomValues(new Uint8Array(12));return b2(iv)+'.'+b2(new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,E.encode(s))));};
-const dec=async(t,k=KEY)=>{const[i,c]=t.split('.');return T.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:u2(i)},k,u2(c)));};
-const verify=async k=>{try{return await dec(meta.chk,k)==='vault-ok';}catch(e){return false;}};
-async function loadAll(){for(const k of Object.keys(localStorage))if(k.startsWith(PF)){try{M.set(k.slice(2),await dec(localStorage.getItem(k)));}catch(e){}}}
-window.V={g:k=>M.get(k),s:(k,v)=>{M.set(k,v);Q[k]=(Q[k]||Promise.resolve()).then(async()=>{try{localStorage.setItem(PF+k,await enc(M.get(k)));}catch(e){}});},d:k=>{M.delete(k);localStorage.removeItem(PF+k);}};
-const relock=()=>{sessionStorage.removeItem(SK);localStorage.removeItem(KP);location.reload();};
-const wipe=()=>{if(prompt('This permanently deletes all tracker data on this device. Type ERASE to confirm.')==='ERASE'){localStorage.clear();sessionStorage.clear();location.reload();}};
-async function auto(){try{let raw=sessionStorage.getItem(SK);const kp=JSON.parse(localStorage.getItem(KP)||'null');if(kp&&kp.e>Date.now()){raw=raw||kp.k;keep=true;}else if(kp)localStorage.removeItem(KP);if(!raw||!meta)return false;const k=await imp(raw);if(!(await verify(k)))return false;KEY=k;await loadAll();return true;}catch(e){return false;}}
-async function boot(stay){
-  const raw=await rawOf(KEY);sessionStorage.setItem(SK,raw);
-  if(stay){localStorage.setItem(KP,JSON.stringify({k:raw,e:Date.now()+30*DAY}));keep=true;}else if(stay===false){localStorage.removeItem(KP);keep=false;}
+const SB_URL='https://supabase.com/dashboard/project/jmghhiakyyyncnlmrwtg',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZ2hoaWFreXl5bmNubG1yd3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MzAwNDEsImV4cCI6MjEwOTIwNjA0MX0.w6DN8QBk6_cPGhdOKJMguWlY9eMgrYz86KTomz_5kjc';
+const $=id=>document.getElementById(id),LS=localStorage,SS='sb:sess',M=new Map(),dirty=new Set(),u2=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+let S=null,uid=null,tm=null,up=false;try{S=JSON.parse(LS.getItem(SS)||'null');}catch(e){}
+const api=async(p,o={},anon)=>{const r=await fetch(SB_URL+p,{...o,headers:{apikey:SB_KEY,'Content-Type':'application/json',Authorization:'Bearer '+(!anon&&S?S.access_token:SB_KEY),...(o.headers||{})}});const t=await r.text();let j=null;try{j=t?JSON.parse(t):null;}catch(e){}if(!r.ok){const e=new Error((j&&(j.msg||j.error_description||j.message))||'HTTP '+r.status);e.status=r.status;throw e;}return j;};
+const setS=j=>{S={access_token:j.access_token,refresh_token:j.refresh_token,exp:Date.now()+(j.expires_in||3600)*1e3-6e4,uid:j.user.id};LS.setItem(SS,JSON.stringify(S));};
+const refresh=async()=>setS(await api('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:S.refresh_token})},true));
+const rest=async(p,o)=>{if(S&&S.exp<Date.now())await refresh();return api('/rest/v1/'+p,o);};
+const ck=k=>'u:'+uid+':'+k,saveD=()=>LS.setItem('ud:'+uid,JSON.stringify([...dirty]));
+async function flush(){if(!dirty.size)return;const ks=[...dirty];try{await rest('user_data?on_conflict=user_id,key',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(ks.map(k=>({user_id:uid,key:k,value:M.get(k)})).filter(r=>r.value!=null))});ks.forEach(k=>dirty.delete(k));saveD();}catch(e){}}
+async function pull(){const rows=await rest('user_data?select=key,value');(rows||[]).forEach(r=>{if(dirty.has(r.key))return;M.set(r.key,r.value);LS.setItem(ck(r.key),r.value);});}
+window.pullAll=async()=>{await flush();await pull();};
+window.V={g:k=>M.get(k),s:(k,v)=>{M.set(k,v);LS.setItem(ck(k),v);dirty.add(k);saveD();clearTimeout(tm);tm=setTimeout(flush,800);},d:k=>{M.delete(k);LS.removeItem(ck(k));dirty.delete(k);rest('user_data?key=eq.'+encodeURIComponent(k),{method:'DELETE'}).catch(()=>{});}};
+addEventListener('online',flush);
+async function signout(){await flush();Object.keys(LS).filter(x=>/^(u|ud):/.test(x)||x===SS).forEach(x=>LS.removeItem(x));location.reload();}
+async function migrate(){const mt=JSON.parse(LS.getItem('vault:meta')||'null');if(!mt)return;const pw=prompt('Found data saved on this device before accounts existed. Enter your OLD passphrase to import it (Cancel to skip).');if(pw===null)return;try{const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']),k=await crypto.subtle.deriveKey({name:'PBKDF2',salt:u2(mt.salt),iterations:600000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']),dec=async t=>{const[i,c]=t.split('.');return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:u2(i)},k,u2(c)));};await dec(mt.chk);const out=[];for(const x of Object.keys(LS))if(x.startsWith('v:')){const key=x.slice(2);if(!M.has(key))out.push([key,await dec(LS.getItem(x))]);}out.forEach(([a,b])=>V.s(a,b));Object.keys(LS).filter(x=>x.startsWith('v:')||x.startsWith('vault:')).forEach(x=>LS.removeItem(x));}catch(e){alert('That passphrase didn’t work. Your old data is still on this device; reload to try again.');}}
+async function boot(){
+  uid=S.uid;try{JSON.parse(LS.getItem('ud:'+uid)||'[]').forEach(k=>dirty.add(k));}catch(e){}
+  Object.keys(LS).filter(x=>x.startsWith('u:'+uid+':')).forEach(x=>M.set(x.slice(('u:'+uid+':').length),LS.getItem(x)));
+  try{await pull();}catch(e){if(e.status===401||e.status===403){LS.removeItem(SS);S=null;return show();}}
+  await migrate();flush();
   document.body.classList.remove('locked');$('vlock').remove();
   const sc=document.createElement('script');sc.textContent=$('app').textContent;document.body.appendChild(sc);
-  const mk=(h,f)=>{const b=document.createElement('button');b.innerHTML=h;b.onclick=()=>{document.body.classList.remove('menu');f();};return b;};
-  if($('t3'))$('t3').after(mk(LOCK_ICON+'Lock now',relock),mk(SH_ICON+'Security',openSec));
-  let hid=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hid=Date.now();else if(hid&&Date.now()-hid>6e5&&!keep)relock();});
-}
-function openSec(){
-  const o=document.createElement('div');o.id='vsec';o.className='sheet';
-  o.innerHTML='<header><button class="ib" id="vsb" aria-label="Back"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1>Security</h1><span style="width:44px"></span></header>'+
-  '<div class="card"><label class="vlr"><input type="checkbox" id="vsk"'+(keep?' checked':'')+'><b>Stay signed in on this device</b></label><div class="mut" style="margin-top:6px">Skips the passphrase for 30 days. Anyone holding this unlocked phone can open the app. Off is safer.</div></div>'+
-  '<div class="card"><b>Change passphrase</b><div style="margin-top:10px"><input class="in" id="vso" type="password" placeholder="Current passphrase" autocomplete="current-password"><input class="in" id="vsn" type="password" placeholder="New passphrase (8+ characters)" autocomplete="new-password"><input class="in" id="vsm" type="password" placeholder="Confirm new passphrase" autocomplete="new-password"></div><button class="btn2" id="vsc">Change passphrase</button><div id="vsr" class="mut" style="margin-top:8px" role="status"></div></div>'+
-  '<div class="card"><b>Erase data</b><div class="mut" style="margin:6px 0 10px">Deletes everything this app stores on this device.</div><button class="btn2" id="vse" style="color:var(--red)">Erase all data</button></div>';
-  document.body.appendChild(o);$('vsb').onclick=()=>o.remove();$('vse').onclick=wipe;
-  $('vsk').onchange=async e=>{if(e.target.checked){localStorage.setItem(KP,JSON.stringify({k:await rawOf(KEY),e:Date.now()+30*DAY}));keep=true;}else{localStorage.removeItem(KP);keep=false;}};
-  $('vsc').onclick=async()=>{const m=t=>$('vsr').textContent=t,n=$('vsn').value;if(n.length<8||n!==$('vsm').value)return m('The new passphrase must match and be 8+ characters.');m('Working…');
-    if(!(await verify(await derive($('vso').value,u2(meta.salt)))))return m('Current passphrase is wrong.');
-    const salt=crypto.getRandomValues(new Uint8Array(16)),k=await derive(n,salt),out=[];for(const[x,v]of M)out.push([PF+x,await enc(v,k)]);
-    const nm={salt:b2(salt),chk:await enc('vault-ok',k)};out.forEach(([a,b])=>localStorage.setItem(a,b));localStorage.setItem(MK,JSON.stringify(nm));meta=nm;KEY=k;sessionStorage.setItem(SK,await rawOf(k));if(keep)localStorage.setItem(KP,JSON.stringify({k:await rawOf(k),e:Date.now()+30*DAY}));
-    ['vso','vsn','vsm'].forEach(i=>$(i).value='');m('Passphrase changed.');};
+  if($('t3')){const b=document.createElement('button');b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign out';b.onclick=()=>{document.body.classList.remove('menu');signout();};$('t3').after(b);}
 }
 function show(){
-  const first=!meta;$('vlt').textContent=first?'Create your passphrase':'Welcome back';
-  $('vls').textContent=first?'This locks your workouts, food log and settings on this device.':'Enter your passphrase to unlock.';
-  $('vlc').hidden=first?false:true;$('vlp').autocomplete=first?'new-password':'current-password';$('vlb').textContent=first?'Create and unlock':'Unlock';
-  $('vlw').textContent=first?'There is no recovery. If you forget this passphrase, your data cannot be restored. Pick something long that you will remember.':'';
-  $('vlx').hidden=first;$('vlx').onclick=wipe;
-  $('vlsh').onclick=()=>{const h=$('vlp').type==='password';$('vlp').type=h?'text':'password';$('vlsh').textContent=h?'Hide':'Show';};
-  $('vlf').onsubmit=async e=>{e.preventDefault();const pw=$('vlp').value,err=$('vle'),b=$('vlb');err.textContent='';
-    if(Date.now()<until)return err.textContent='Too many tries. Wait '+Math.ceil((until-Date.now())/1000)+' seconds.';
-    if(first){if(pw.length<8)return err.textContent='Use at least 8 characters. A few random words works well.';if(pw!==$('vlc').value)return err.textContent='The passphrases don’t match.';}
-    b.disabled=true;b.textContent=first?'Securing…':'Unlocking…';
-    try{
-      if(first){
-        const salt=crypto.getRandomValues(new Uint8Array(16));KEY=await derive(pw,salt);
-        const old=Object.keys(localStorage).filter(x=>!x.startsWith('vault:')&&!x.startsWith(PF)),out=[];
-        for(const x of old){const v=localStorage.getItem(x);M.set(x,v);out.push([PF+x,await enc(v)]);}
-        meta={salt:b2(salt),chk:await enc('vault-ok')};out.forEach(([a,c])=>localStorage.setItem(a,c));localStorage.setItem(MK,JSON.stringify(meta));old.forEach(x=>localStorage.removeItem(x));
-      }else{
-        const k=await derive(pw,u2(meta.salt));
-        if(!(await verify(k))){if(++fails>=5){until=Date.now()+3e4;fails=0;}err.textContent='Wrong passphrase.';b.disabled=false;b.textContent='Unlock';return;}
-        KEY=k;await loadAll();
-      }
-      await boot($('vlk').checked);
-    }catch(x){err.textContent='Couldn’t unlock. Make sure the page is on HTTPS and try again.';b.disabled=false;b.textContent=first?'Create and unlock':'Unlock';}
-  };
-  $('vlp').focus();
+  let up=false;const draw=()=>{$('vlt').textContent=up?'Create your account':'Sign in';$('vls').textContent=up?'Your workouts and settings will sync across your devices.':'Welcome back.';$('vlb').textContent=up?'Create account':'Sign in';$('vlx').textContent=up?'I already have an account':'Create an account';$('vlp').autocomplete=up?'new-password':'current-password';};draw();
+  $('vlx').onclick=()=>{up=!up;$('vle').textContent='';draw();};
+  $('vlf').onsubmit=async e=>{e.preventDefault();const err=$('vle'),b=$('vlb'),body=JSON.stringify({email:$('vlm').value.trim(),password:$('vlp').value});err.textContent='';b.disabled=true;
+    try{const j=await api(up?'/auth/v1/signup':'/auth/v1/token?grant_type=password',{method:'POST',body},true);
+      if(!j.access_token){err.textContent='Check your email to confirm your account, then sign in.';b.disabled=false;return;}
+      setS(j);await boot();}
+    catch(x){err.textContent=x.message||'Couldn’t sign in.';b.disabled=false;}};
+  $('vlm').focus();
 }
-(async()=>{if(!window.crypto||!crypto.subtle){$('vlt').textContent='Secure connection needed';$('vls').textContent='Open this app over HTTPS to unlock it.';$('vlp').hidden=true;$('vlb').hidden=true;$('vlk').parentNode.hidden=true;$('vlc').hidden=true;return;}
-  if(await auto())await boot();else show();})();
+(async()=>{if(SB_URL.startsWith('YOUR_')){$('vlt').textContent='Setup needed';$('vls').textContent='Add your Supabase URL and anon key at the top of index.html.';$('vlf').querySelectorAll('input,button').forEach(x=>x.hidden=true);return;}
+  if(S){try{if(S.exp<Date.now())await refresh();}catch(e){if(e.status&&e.status<500){LS.removeItem(SS);S=null;}}}
+  if(S)await boot();else show();})();
 })();
 </script>
 <script id="app" type="text/plain">
@@ -1141,10 +1110,11 @@ function pgpx(t){const x=new DOMParser().parseFromString(t,'text/xml'),out=[];x.
   for(let i=1;i<Q.length;i++){const a=Q[i-1],b=Q[i],r=Math.PI/180,dl=(b.la-a.la)*r,dn=(b.lo-a.lo)*r,h=Math.sin(dl/2)**2+Math.cos(a.la*r)*Math.cos(b.la*r)*Math.sin(dn/2)**2;m+=2*6371000*Math.asin(Math.sqrt(h));}
   pts.forEach(p=>{const e=p.getElementsByTagNameNS('*','hr')[0];if(e){hs+=+e.textContent;hn++;}});const t0=Q[0].t,t1=Q[Q.length-1].t;if(!t0)return;const nm=tk.querySelector('name')?.textContent||'Workout';out.push({d:dk(t0),t:ty((tk.querySelector('type')?.textContent||'')+' '+nm),n:nm,m,s:t1?(t1-t0)/1000:0,k:0,h:hn?hs/hn:0});});return out;}
 function addW(a){let n=0;a.forEach(r=>{const o={id:Date.now()*1000+Math.floor(Math.random()*1000),d:r.d,t:r.t||'Other',n:r.n||r.t,m:Math.round(r.m)||0,s:Math.round(r.s)||0,k:Math.round(r.k)||0,h:Math.round(r.h)||0};if(!o.s&&!o.m)return;if(!o.k)o.k=est(o);if(WO.some(w=>w.d===o.d&&w.t===o.t&&Math.abs(w.s-o.s)<5&&Math.abs(w.m-o.m)<20))return;WO.push(o);n++;});WO.sort((a,b)=>b.d.localeCompare(a.d));ls.s('calWo',WO);return n;}
+const DU=()=>(cfg.du||(P&&P.u==='i'?'mi':'km'))==='mi'?[1609.344,'mi']:[1000,'km'];
 let MT='All',LT='',LD='';
 function wrender(){
-  const du=P&&P.u==='i'?[1609.344,'mi']:[1000,'km'],fd=m=>r1(m/du[0])+' '+du[1],fh=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m';},pc=(s,m)=>{const p=Math.round(s/(m/du[0]));return Math.floor(p/60)+':'+String(p%60).padStart(2,'0')+' /'+du[1];},S=k=>WO.reduce((a,w)=>a+w[k],0);
-  $('w_ml').textContent='Distance ('+du[1]+')';
+  const du=DU(),fd=m=>r1(m/du[0])+' '+du[1],fh=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m';},pc=(s,m)=>{const p=Math.round(s/(m/du[0]));return Math.floor(p/60)+':'+String(p%60).padStart(2,'0')+' /'+du[1];},S=k=>WO.reduce((a,w)=>a+w[k],0);
+  $('w_ml').textContent='Distance ('+du[1]+')';$('wun').textContent='Distance units: '+du[1]+' (tap to switch)';
   $('wst').innerHTML='<b>All time</b><div class="g2" style="margin-top:8px">'+[[WO.length,'Workouts'],[fd(S('m')),'Distance'],[fh(S('s')),'Time'],[Math.round(S('k')).toLocaleString(),'kcal burned']].map(x=>'<div><div style="font-size:24px;font-weight:700">'+x[0]+'</div><div class="mut">'+x[1]+'</div></div>').join('')+'</div>';
   $('wty').innerHTML='<b>By activity</b>'+(Object.keys(IW).map(t=>{const a=WO.filter(w=>w.t===t);if(!a.length)return '';const m=a.reduce((s,w)=>s+w.m,0),s=a.reduce((x,w)=>x+w.s,0);return '<div style="display:flex;justify-content:space-between;padding:7px 0"><span>'+IW[t]+' '+t+' · '+a.length+'</span><span class="mut">'+(m?fd(m)+' · ':'')+fh(s)+(m&&/Run|Walk|Hike/.test(t)?' · '+pc(s,m):'')+'</span></div>';}).join('')||'<div class="mut" style="margin-top:6px">Nothing yet. Import a Garmin or Coros export, or add a workout.</div>');
   const cw=new Date();cw.setDate(cw.getDate()-((cw.getDay()+6)%7));const bars=[];for(let i=7;i>=0;i--){const a=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()-i*7),b=new Date(a.getFullYear(),a.getMonth(),a.getDate()+7),ka=dk(a),kb=dk(b);bars.push([a,WO.filter(w=>w.d>=ka&&w.d<kb).reduce((s,w)=>s+w.k,0)]);}
@@ -1172,7 +1142,7 @@ $('wadd').onclick=()=>{$('wmenu').classList.add('hide');$('w_d').value=dk(new Da
 $('wmore').onclick=e=>{e.stopPropagation();$('wmenu').classList.toggle('hide');};
 document.addEventListener('click',e=>{if(!e.target.closest('#wmenu,#wmore'))$('wmenu').classList.add('hide');});
 $('wfi').addEventListener('change',()=>$('wmenu').classList.add('hide'));
-$('w_sv').onclick=()=>{const u=P&&P.u==='i'?1609.344:1000,t=$('w_t').value,s=(+$('w_s').value||0)*60,m=(+$('w_m').value||0)*u;if(!s&&!m)return toast('Enter a distance or minutes.');
+$('w_sv').onclick=()=>{const u=DU()[0],t=$('w_t').value,s=(+$('w_s').value||0)*60,m=(+$('w_m').value||0)*u;if(!s&&!m)return toast('Enter a distance or minutes.');
   addW([{d:$('w_d').value||dk(new Date()),t,n:$('w_n').value.trim()||t,m,s,k:+$('w_k').value||0,h:+$('w_h').value||0}]);['w_n','w_m','w_s','w_k','w_h'].forEach(i=>$(i).value='');$('wfm').classList.add('hide');wrender();toast('Workout saved');};
 
 // ----- your plan (Mifflin-St Jeor)
@@ -1210,25 +1180,16 @@ $('pcard').onclick=e=>{if(e.target.closest('[data-p]'))openPf();};
   const lm=()=>document.querySelectorAll('#lkm button').forEach(b=>b.classList.toggle('on',b.dataset.look===(cfg.look||'auto')));lm();
   $('lkm').onclick=e=>{const b=e.target.closest('[data-look]');if(!b)return;cfg.look=b.dataset.look;ls.s('cfg',cfg);applyTheme();lm();};})();
 
-// ----- Strava sync (encrypted file written by the GitHub Action)
-const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0)),SF='data/workouts.enc';
-let sfile=null,skey=null;
-async function getFile(){try{const r=await fetch(SF+'?t='+Date.now(),{cache:'no-store'});if(!r.ok)return null;const f=await r.json();return f&&f.ct?f:null;}catch(e){return null;}}
-async function dkey(pass,f){const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(f.salt),iterations:600000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},true,['decrypt']);}
-async function openF(key,f){return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(f.iv)},key,b64(f.ct))));}
+// ----- COROS activities (written to your account by the GitHub Action)
 function syncIn(list){let n=0;const ids=new Set(WO.map(w=>w.sid).filter(Boolean));
   list.forEach(a=>{const o={id:a.sid,sid:a.sid,d:a.d,t:a.t,n:a.n,m:Math.round(a.m),s:a.s,k:Math.round(a.k),h:Math.round(a.h)};if(!o.d||(!o.s&&!o.m))return;if(!o.k)o.k=est(o);
     if(ids.has(a.sid)){WO=WO.map(w=>w.sid===a.sid?o:w);return;}
     if(WO.some(w=>!w.sid&&w.d===o.d&&w.t===o.t&&Math.abs(w.s-o.s)<5&&Math.abs(w.m-o.m)<20))return;WO.push(o);n++;});
   WO.sort((a,b)=>b.d.localeCompare(a.d));ls.s('calWo',WO);return n;}
-async function loadSync(key,f){const d=await openF(key,f),n=syncIn(Object.values(d.acts||{}));skey=key;$('wsr').classList.remove('hide');$('wsy').textContent='Synced '+(d.updated?new Date(d.updated).toLocaleString():'')+' · '+Object.keys(d.acts||{}).length+' activities';render();wrender();return n;}
-async function unlock(pass,remember){const key=await dkey(pass,sfile),n=await loadSync(key,sfile);if(remember)ls.s('calKey',{salt:sfile.salt,k:btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey('raw',key))))});return n;}
-$('lku').onclick=async()=>{const p=$('lkp').value;if(!p)return;$('lke').textContent='Unlocking…';try{const n=await unlock(p,$('lkr').checked);$('lk').classList.add('hide');$('lkp').value='';$('lke').textContent='';toast(n?'Imported '+n+' workouts from Coros':'Unlocked');}catch(e){$('lke').textContent='That passphrase didn’t work.';}};
-$('lkp').onkeydown=e=>{if(e.key==='Enter')$('lku').click();};
-$('lks').onclick=()=>$('lk').classList.add('hide');
-$('wsb').onclick=async()=>{const f=await getFile();if(!f)return toast('Couldn’t reach the sync file.');sfile=f;if(skey){try{const n=await loadSync(skey,f);return toast(n?'Imported '+n+' new workouts':'Already up to date');}catch(e){}}$('lk').classList.remove('hide');};
-$('wlk').onclick=()=>{ls.s('calKey',null);skey=null;WO=WO.filter(w=>!w.sid);ls.s('calWo',WO);$('wsr').classList.add('hide');wrender();render();$('lk').classList.remove('hide');};
-(async()=>{sfile=await getFile();if(!sfile||!window.crypto||!crypto.subtle)return;const ck=ls.g('calKey',null);if(ck&&ck.salt===sfile.salt){try{await loadSync(await crypto.subtle.importKey('raw',b64(ck.k),'AES-GCM',false,['decrypt']),sfile);return;}catch(e){}}$('lk').classList.remove('hide');})();
+function loadCoros(){const d=ls.g('corosActs',null);if(!d||!d.acts)return 0;const n=syncIn(Object.values(d.acts));$('wsr').classList.remove('hide');$('wsy').textContent='Synced '+(d.updated?new Date(d.updated).toLocaleString():'')+' · '+Object.keys(d.acts).length+' activities';render();wrender();return n;}
+$('wsb').onclick=async()=>{try{await window.pullAll();}catch(e){return toast('Couldn’t reach your account.');}const n=loadCoros();toast(n?'Imported '+n+' new workouts':'Already up to date');};
+$('wun').onclick=()=>{cfg.du=DU()[1]==='mi'?'km':'mi';ls.s('cfg',cfg);wrender();};
+loadCoros();
 
 tab(2);
 // ----- scan food: meal photo / nutrition label / description
