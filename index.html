@@ -355,7 +355,7 @@ body.locked>*:not(#vlock):not(script){display:none!important}
 
 <script>
 (()=>{
-const SB_URL='https://supabase.com/dashboard/project/jmghhiakyyyncnlmrwtg',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZ2hoaWFreXl5bmNubG1yd3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MzAwNDEsImV4cCI6MjEwOTIwNjA0MX0.w6DN8QBk6_cPGhdOKJMguWlY9eMgrYz86KTomz_5kjc';
+const SB_URL='https://supabase.com/dashboard/project/jmghhiakyyyncnlmrwtg/settings/api-keys/legacy',SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZ2hoaWFreXl5bmNubG1yd3RnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MzAwNDEsImV4cCI6MjEwOTIwNjA0MX0.w6DN8QBk6_cPGhdOKJMguWlY9eMgrYz86KTomz_5kjc';
 const $=id=>document.getElementById(id),LS=localStorage,SS='sb:sess',M=new Map(),dirty=new Set(),u2=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 let S=null,uid=null,tm=null,up=false;try{S=JSON.parse(LS.getItem(SS)||'null');}catch(e){}
 const api=async(p,o={},anon)=>{const r=await fetch(SB_URL+p,{...o,headers:{apikey:SB_KEY,'Content-Type':'application/json',Authorization:'Bearer '+(!anon&&S?S.access_token:SB_KEY),...(o.headers||{})}});const t=await r.text();let j=null;try{j=t?JSON.parse(t):null;}catch(e){}if(!r.ok){const e=new Error((j&&(j.msg||j.error_description||j.message))||'HTTP '+r.status);e.status=r.status;throw e;}return j;};
