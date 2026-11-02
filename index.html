@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Track Workout</title>
 <style>
-:root{--bg:#fdfbff;--sv:#ecebf4;--pc:#dde1ff;--p:#4558a9;--onp:#fff;--on:#1b1b1f;--mut:#5c5e72;--ol:#c6c6d0;--red:#f44336;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#ffffff;--sv:#f4f4f6;--pc:#e9e9ee;--p:#111111;--onp:#fff;--on:#1b1b1f;--mut:#5c5e72;--ol:#c6c6d0;--red:#f44336;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121316;--sv:#2a2a33;--pc:#2f3f8c;--p:#b6c4ff;--onp:#0b1b5c;--on:#e4e1e9;--mut:#c5c5d4;--ol:#46464f}}
 :root[data-theme="dark"]{--bg:#121316;--sv:#2a2a33;--pc:#2f3f8c;--p:#b6c4ff;--onp:#0b1b5c;--on:#e4e1e9;--mut:#c5c5d4;--ol:#46464f}
 *{box-sizing:border-box}html,body{margin:0}
@@ -200,7 +200,7 @@ body.locked>*:not(#vlock):not(script){display:none!important}
 .vlr{display:flex;gap:8px;align-items:center}#vle{color:var(--red);font-size:14px;min-height:20px}
 #vsec{z-index:90}#vsec .in{margin-bottom:8px}
 </style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#4558a9"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
 <body class="locked">
 <div id="vlock"><form id="vlf"><h1 id="vlt"></h1><div class="mut" id="vls"></div><input class="in" id="vlm" type="email" placeholder="Email" autocomplete="email" required><input class="in" id="vlp" type="password" placeholder="Password (8+ characters)" autocomplete="current-password" required minlength="8"><div class="mut" id="vle" role="alert"></div><button class="btn" id="vlb"></button><button type="button" class="btn2" id="vlx"></button></form></div>
@@ -400,7 +400,7 @@ function show(){
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ls={g(k,d){try{const v=V.g(k);return v==null?d:JSON.parse(v)}catch(e){return d}},s(k,v){try{V.s(k,JSON.stringify(v))}catch(e){}}};
-let cfg=Object.assign({mode:'single',device:'iPhone',cd:3,line:50,sens:6,gap:2,ath:'Athlete 1',face:'environment',code:'',sm:'auto',rep:1,dist:60,reps:0,rest:90,ar:1,flip:'auto',lapm:'user',pal:'lime',look:'auto'},ls.g('cfg',{}));
+let cfg=Object.assign({mode:'single',device:'iPhone',cd:3,line:50,sens:6,gap:2,ath:'Athlete 1',face:'environment',code:'',sm:'auto',rep:1,dist:60,reps:0,rest:90,ar:1,flip:'auto',lapm:'user',pal:'cal',look:'light'},ls.g('cfg',{}));
 if(!cfg.v2){cfg.v2=1;cfg.rep=1;cfg.sm='auto';cfg.reps=0;cfg.ar=1;ls.s('cfg',cfg);}
 if(!cfg.v3){cfg.v3=1;cfg.pal='cal';ls.s('cfg',cfg);}
 if(!cfg.v4){cfg.v4=1;cfg.pal='warm';ls.s('cfg',cfg);}
