@@ -148,23 +148,25 @@ body.menu .tabs{transform:none}
 .tabs svg{width:22px;height:22px;flex:none}
 .tabs .dh{padding:4px 16px 22px;font-size:26px;font-weight:700}
 /* ---- redesign v2: lime / forest */
-.btn{box-shadow:0 8px 22px #b6e24c55}
-#meals .hd .ib{color:var(--onp)!important;box-shadow:0 6px 14px #b6e24c55}
-.tabs button.on{box-shadow:0 8px 18px #b6e24c55}
-#sum,#whr{background:linear-gradient(150deg,#1d2a1c,#0a0e0a);color:#fff;border:0;box-shadow:0 14px 34px #0a0e0a55}
-#sum .bb i{background:#d4f78c}#sum circle[stroke="var(--p)"]{stroke:#d4f78c}
+#meals .hd .ib{color:var(--onp)!important}
+#sum,#whr{color:#fff;border:0}
 #whr{padding:20px}
 #wst{background:var(--sv);color:var(--on);border:1px solid #00000008;box-shadow:0 1px 2px #00000008,0 10px 30px #0000000d}
 #wst .mut{color:var(--mut)}
-footer.bar{background:#0f150f}
 .tabs #tm{margin-top:auto;background:var(--bg)}
 #wom{padding-bottom:28px}
 #lkm{display:flex;gap:6px;padding:4px;background:var(--sv);border-radius:18px;box-shadow:inset 0 0 0 1px #00000010}
 #lkm button{flex:1;padding:11px;border-radius:14px;font-weight:600;color:var(--mut);transition:.25s}
-#lkm button.on{background:var(--p);color:var(--onp);box-shadow:0 6px 16px #b6e24c55}
+#lkm button.on{background:var(--p);color:var(--onp)}
 #wmenu{position:absolute;right:0;top:44px;z-index:6;display:flex;flex-direction:column;min-width:190px;padding:6px;background:var(--sv);border-radius:18px;box-shadow:0 12px 32px #0000002e,0 0 0 1px #00000010;font-size:15px;font-weight:500}
 #wmenu>*{padding:12px 14px;border-radius:12px;text-align:left;cursor:pointer;color:var(--on)}
 #wmenu>*:active{background:var(--bg)}
+/* ---- feature cards follow the active theme (vars are set in applyTheme) */
+#sum,#whr{background:linear-gradient(150deg,var(--cg1,#1c1c1c),var(--cg2,#0a0a0a));box-shadow:0 14px 34px var(--csh,#0000008c)}
+#sum,#whr{--hp:var(--hpx,#e8e8e8)}
+#sum .bb i{background:var(--hp)}#sum circle[stroke="var(--p)"]{stroke:var(--hp)}
+footer.bar{background:var(--fbg,#0d0d0d)}
+.btn,#meals .hd .ib,.tabs button.on,#lkm button.on{box-shadow:0 8px 20px var(--bsh,#00000030)}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
 </head>
@@ -822,6 +824,10 @@ function applyTheme(){
   const dk=cfg.look==='dark'||(cfg.look!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches),c=(PAL[cfg.pal]||PAL.indigo)[dk?1:0],t=TXT[dk?1:0],r=document.documentElement,st=r.style;
   r.dataset.theme=dk?'dark':'light';st.colorScheme=dk?'dark':'light';
   ['bg','sv','pc','p','onp'].forEach((n,i)=>st.setProperty('--'+n,c[i]));['on','mut','ol'].forEach((n,i)=>st.setProperty('--'+n,t[i]));
+  const hx=h=>{h=h.replace('#','');if(h.length===3)h=h.replace(/./g,'$&$&');return[0,2,4].map(i=>parseInt(h.substr(i,2),16));},
+    mx=(a,b,q)=>'rgb('+hx(a).map((v,i)=>Math.round(v*q+hx(b)[i]*(1-q))).join(',')+')',
+    al=(a,q)=>'rgba('+hx(a).join(',')+','+q+')';
+  [['hpx',mx(c[3],'#ffffff',.35)],['cg1',mx(c[3],'#1c1c1c',.14)],['cg2',mx(c[3],'#0a0a0a',.04)],['fbg',mx(c[3],'#0d0d0d',.05)],['csh',mx(c[3],'#00000000',.18)],['bsh',al(c[3],.35)]].forEach(([n,v])=>st.setProperty('--'+n,v));
 }
 function buildSw(){
   $('sw').innerHTML=Object.keys(PAL).map(k=>'<button data-pal="'+k+'" title="'+k+'" aria-label="'+k+'" style="width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,'+PAL[k][0][3]+' 50%,'+PAL[k][1][3]+' 50%);border:3px solid '+(cfg.pal===k?'var(--on)':'var(--ol)')+';transform:scale('+(cfg.pal===k?1.1:1)+');transition:.2s"></button>').join('');
@@ -1025,7 +1031,7 @@ function wrender(){
   const wdl=['M','T','W','T','F','S','S'],tdk=dk(new Date()),PC={Run:'#fde7d6',Cycle:'#dbeafe',Walk:'#e4f3d4',Swim:'#d5f0f4',Hike:'#efe4d1',Strength:'#f1dcf3',Other:'#ececec'};
   $('wds').innerHTML='<div style="display:flex;gap:6px;margin:0 16px 14px">'+wdl.map((l,i)=>{const d=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()+i),k=dk(d),on=k===tdk;return '<button data-ld="'+k+'" style="flex:1;padding:9px 0;border-radius:18px;text-align:center;font-weight:600;'+(on?'background:var(--p);color:var(--onp);':'background:var(--sv);')+(LD===k?'box-shadow:inset 0 0 0 2px var(--on);':'')+'"><div style="font-size:11px;opacity:.7">'+l+'</div><div style="font-size:16px">'+d.getDate()+'</div><div style="height:8px;font-size:8px;line-height:8px">'+(WO.some(w=>w.d===k)?'●':'')+'</div></button>';}).join('')+'</div>';
   const L1=WO[0];
-  $('whr').innerHTML=L1?'<div style="font-size:12px;opacity:.7">Latest session</div><div style="font-size:28px;font-weight:700;margin:4px 0 2px">'+esc(L1.n)+'</div><div style="opacity:.7">'+L1.t+' · '+L1.d+'</div><div style="display:flex;gap:16px;margin-top:14px;align-items:center"><span>'+fh(L1.s)+'</span><span>'+L1.k+' kcal</span>'+(L1.m?'<span>'+fd(L1.m)+'</span>':'')+'<button data-go="1" aria-label="See history" style="margin-left:auto;width:48px;height:48px;border-radius:50%;background:#d4f78c;color:#10200a;font-size:24px">›</button></div>':'<div style="font-size:22px;font-weight:700">No sessions yet</div><div style="opacity:.7;margin-top:4px">Import your Coros data or add a workout below.</div>';
+  $('whr').innerHTML=L1?'<div style="font-size:12px;opacity:.7">Latest session</div><div style="font-size:28px;font-weight:700;margin:4px 0 2px">'+esc(L1.n)+'</div><div style="opacity:.7">'+L1.t+' · '+L1.d+'</div><div style="display:flex;gap:16px;margin-top:14px;align-items:center"><span>'+fh(L1.s)+'</span><span>'+L1.k+' kcal</span>'+(L1.m?'<span>'+fd(L1.m)+'</span>':'')+'<button data-go="1" aria-label="See history" style="margin-left:auto;width:48px;height:48px;border-radius:50%;background:var(--hp);color:#111;font-size:24px">›</button></div>':'<div style="font-size:22px;font-weight:700">No sessions yet</div><div style="opacity:.7;margin-top:4px">Import your Coros data or add a workout below.</div>';
   $('wcat').innerHTML='<div style="margin:0 16px 8px;font-weight:700;font-size:18px">Categories</div><div style="display:flex;gap:10px;overflow-x:auto;padding:4px 16px 14px">'+Object.keys(IW).map(t=>'<button data-lt="'+t+'" style="flex:none;width:104px;padding:14px 12px;border-radius:24px;text-align:left;color:#1b1b1f;background:'+PC[t]+';'+(LT===t?'box-shadow:inset 0 0 0 2px var(--on);':'')+'"><div style="font-size:12px;opacity:.7">'+WO.filter(w=>w.t===t).length+' sessions</div><div style="font-weight:700;font-size:16px;margin-top:2px">'+t+'</div><div style="font-size:26px;margin-top:8px">'+IW[t]+'</div></button>').join('')+'</div>';
   const LW=WO.filter(w=>(!LT||w.t===LT)&&(!LD||w.d===LD));
   $('wlist').innerHTML=(LT||LD?'<div class="mut" style="margin:0 16px 8px">Showing '+[LT,LD].filter(Boolean).join(' · ')+' <button class="btn2" data-clr="1" style="padding:2px 10px;font-size:12px">Clear</button></div>':'')+LW.slice(0,100).map(w=>'<div class="sp"><div style="font-size:26px">'+IW[w.t]+'</div><div class="sm"><div>'+esc(w.n)+'</div><div class="mut">'+w.d+(w.m?' · '+fd(w.m):'')+' · '+fh(w.s)+(w.m&&/Run|Walk|Hike/.test(w.t)?' · '+pc(w.s,w.m):'')+(w.h?' · '+w.h+' bpm':'')+'</div></div><b style="font-size:17px">'+w.k+' kcal</b><button class="ib" data-w="'+w.id+'" aria-label="Delete">✕</button></div>').join('');
