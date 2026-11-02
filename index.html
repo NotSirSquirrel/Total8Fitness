@@ -235,7 +235,8 @@ body.locked>*:not(#vlock):not(script){display:none!important}
 <main class="cv" id="wom">
   <div id="wds"></div><div class="card" id="whr"></div><div id="wcat"></div>
   
-  <div id="wsr" class="hide" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">↻ Sync Coros</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
+  <div id="wsr" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">Connect COROS</button><button class="btn2 hide" id="wsd">Disconnect</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
+  <div id="wcf" class="hide card"><div style="font-weight:700;margin-bottom:4px">Connect your COROS account</div><div class="mut" style="font-size:12px;margin-bottom:8px" id="wch2">Use the email and password you sign in to COROS with (not Google/Apple). Your password is sent once to log in and isn’t stored; only a login token is kept, so you’ll need to reconnect when it expires.</div><input class="in" id="wcm" type="email" placeholder="COROS email" autocomplete="off"><input class="in" id="wcp" type="password" placeholder="COROS password" autocomplete="off" style="margin-top:6px"><select class="in" id="wcr" style="margin-top:6px"><option value="en">Americas / Asia-Pacific</option><option value="eu">Europe</option><option value="cn">China</option></select><div id="wce" class="mut" style="min-height:20px;margin-top:6px;color:var(--er,#b3261e)"></div><div style="display:flex;gap:8px"><button class="btn2" id="wcs">Connect</button><button class="btn2" id="wcx">Cancel</button></div></div>
   <div id="wfm" class="hide card"><div class="g2"><select class="in" id="w_t"><option>Run</option><option>Walk</option><option>Cycle</option><option>Swim</option><option>Hike</option><option>Strength</option><option>Other</option></select><input class="in" id="w_d" type="date"></div><input class="in" id="w_n" placeholder="Title (optional)" style="margin-top:6px"><div class="g2"><div><label class="mut" id="w_ml" style="font-size:12px">Distance (km)</label><input class="in" id="w_m" type="number" inputmode="decimal"></div><div><label class="mut" style="font-size:12px">Minutes</label><input class="in" id="w_s" type="number" inputmode="decimal"></div></div><div class="g2"><div><label class="mut" style="font-size:12px">Calories (blank = estimate)</label><input class="in" id="w_k" type="number" inputmode="numeric"></div><div><label class="mut" style="font-size:12px">Avg heart rate</label><input class="in" id="w_h" type="number" inputmode="numeric"></div></div><button class="btn" id="w_sv" style="margin:10px 0 0">Save workout</button></div>
   <div style="margin:0 12px 10px"><button class="btn2" id="wun"></button></div><div class="card" id="wst"></div><div class="card" id="wmi"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
   <div class="hd" style="display:flex;align-items:center;justify-content:space-between;position:relative">History<button class="ib" id="wmore" aria-label="More options" style="font-size:22px;color:var(--mut)">⋯</button><div id="wmenu" class="hide"><label>Import file<input id="wfi" type="file" multiple accept=".csv,.tcx,.gpx,.fit,.txt" class="hide"></label><button id="wadd">Add workout</button></div></div><div id="wlist"></div>
@@ -366,6 +367,7 @@ const ck=k=>'u:'+uid+':'+k,saveD=()=>LS.setItem('ud:'+uid,JSON.stringify([...dir
 async function flush(){if(!dirty.size)return;const ks=[...dirty];try{await rest('user_data?on_conflict=user_id,key',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify(ks.map(k=>({user_id:uid,key:k,value:M.get(k)})).filter(r=>r.value!=null))});ks.forEach(k=>dirty.delete(k));saveD();}catch(e){}}
 async function pull(){const rows=await rest('user_data?select=key,value');(rows||[]).forEach(r=>{if(dirty.has(r.key))return;M.set(r.key,r.value);LS.setItem(ck(r.key),r.value);});}
 window.pullAll=async()=>{await flush();await pull();};
+window.fn=async(n,b)=>{if(S&&S.exp<Date.now())await refresh();return api('/functions/v1/'+n,{method:'POST',body:JSON.stringify(b||{})});};
 window.V={g:k=>M.get(k),s:(k,v)=>{M.set(k,v);LS.setItem(ck(k),v);dirty.add(k);saveD();clearTimeout(tm);tm=setTimeout(flush,800);},d:k=>{M.delete(k);LS.removeItem(ck(k));dirty.delete(k);rest('user_data?key=eq.'+encodeURIComponent(k),{method:'DELETE'}).catch(()=>{});}};
 addEventListener('online',flush);
 async function signout(){await flush();Object.keys(LS).filter(x=>/^(u|ud):/.test(x)||x===SS).forEach(x=>LS.removeItem(x));location.reload();}
@@ -1180,16 +1182,35 @@ $('pcard').onclick=e=>{if(e.target.closest('[data-p]'))openPf();};
   const lm=()=>document.querySelectorAll('#lkm button').forEach(b=>b.classList.toggle('on',b.dataset.look===(cfg.look||'auto')));lm();
   $('lkm').onclick=e=>{const b=e.target.closest('[data-look]');if(!b)return;cfg.look=b.dataset.look;ls.s('cfg',cfg);applyTheme();lm();};})();
 
-// ----- COROS activities (written to your account by the GitHub Action)
+// ----- COROS: each account links its own COROS login; the server fetches and saves to this account
+let CL=null;
 function syncIn(list){let n=0;const ids=new Set(WO.map(w=>w.sid).filter(Boolean));
   list.forEach(a=>{const o={id:a.sid,sid:a.sid,d:a.d,t:a.t,n:a.n,m:Math.round(a.m),s:a.s,k:Math.round(a.k),h:Math.round(a.h)};if(!o.d||(!o.s&&!o.m))return;if(!o.k)o.k=est(o);
     if(ids.has(a.sid)){WO=WO.map(w=>w.sid===a.sid?o:w);return;}
     if(WO.some(w=>!w.sid&&w.d===o.d&&w.t===o.t&&Math.abs(w.s-o.s)<5&&Math.abs(w.m-o.m)<20))return;WO.push(o);n++;});
   WO.sort((a,b)=>b.d.localeCompare(a.d));ls.s('calWo',WO);return n;}
-function loadCoros(){const d=ls.g('corosActs',null);if(!d||!d.acts)return 0;const n=syncIn(Object.values(d.acts));$('wsr').classList.remove('hide');$('wsy').textContent='Synced '+(d.updated?new Date(d.updated).toLocaleString():'')+' · '+Object.keys(d.acts).length+' activities';render();wrender();return n;}
-$('wsb').onclick=async()=>{try{await window.pullAll();}catch(e){return toast('Couldn’t reach your account.');}const n=loadCoros();toast(n?'Imported '+n+' new workouts':'Already up to date');};
+function corosUi(){const d=ls.g('corosActs',null),n=d&&d.acts?Object.keys(d.acts).length:0,on=CL&&CL.linked;
+  $('wsb').textContent=on?'↻ Sync COROS':'Connect COROS';$('wsd').classList.toggle('hide',!on);
+  $('wsy').textContent=on?(d&&d.updated?'Synced '+new Date(d.updated).toLocaleString()+' · '+n+' activities':'Connected'+(CL.email?' as '+CL.email:'')):(n?n+' activities from an earlier sync':'');}
+function loadCoros(){const d=ls.g('corosActs',null);let n=0;if(d&&d.acts){n=syncIn(Object.values(d.acts));render();wrender();}corosUi();return n;}
+function corosForm(msg){$('wcm').value=(CL&&CL.email)||$('wcm').value;if(CL&&CL.region)$('wcr').value=CL.region;$('wce').textContent=msg||'';$('wcf').classList.remove('hide');$('wcf').scrollIntoView({behavior:'smooth',block:'center'});(($('wcm').value)?$('wcp'):$('wcm')).focus();}
+async function corosSync(quiet){
+  try{const r=await window.fn('coros-sync',{action:'sync'});
+    if(r.throttled){if(!quiet)toast('Just synced. Try again in a minute.');return;}
+    await window.pullAll();const n=loadCoros();if(!quiet)toast(n?'Imported '+n+' new workouts':'Already up to date');
+  }catch(e){if(e.status===409){corosForm('Your COROS connection expired. Enter your password to reconnect.');}else if(!quiet)toast(e.message||'Couldn’t sync COROS.');}}
+$('wsb').onclick=()=>{if(CL&&CL.linked)corosSync(false);else corosForm();};
+$('wcx').onclick=()=>{$('wcp').value='';$('wcf').classList.add('hide');};
+$('wcs').onclick=async()=>{const e=$('wce'),b=$('wcs');e.textContent='';b.disabled=true;b.textContent='Connecting…';
+  try{const em=$('wcm').value.trim(),rg=$('wcr').value,r=await window.fn('coros-sync',{action:'link',email:em,password:$('wcp').value,region:rg});
+    $('wcp').value='';CL={linked:true,email:em,region:rg};await window.pullAll();loadCoros();$('wcf').classList.add('hide');toast('Connected · '+(r.total||0)+' activities');
+  }catch(x){e.textContent=x.message||'Couldn’t connect.';}
+  b.disabled=false;b.textContent='Connect';};
+$('wsd').onclick=async()=>{if(!confirm('Disconnect COROS? Workouts already imported will stay.'))return;
+  try{await window.fn('coros-sync',{action:'unlink'});CL={linked:false};corosUi();toast('COROS disconnected');}catch(x){toast(x.message||'Couldn’t disconnect.');}};
 $('wun').onclick=()=>{cfg.du=DU()[1]==='mi'?'km':'mi';ls.s('cfg',cfg);wrender();};
 loadCoros();
+window.fn('coros-sync',{action:'status'}).then(r=>{CL=r;corosUi();if(r.linked&&(!r.lastSync||Date.now()-Date.parse(r.lastSync)>3*36e5))corosSync(true);}).catch(()=>{});
 
 tab(2);
 // ----- scan food: meal photo / nutrition label / description
