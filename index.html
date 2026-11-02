@@ -238,8 +238,8 @@ body.locked>*:not(#vlock):not(script){display:none!important}
   <div id="wsr" style="display:flex;align-items:center;gap:8px;margin:0 12px 10px;flex-wrap:wrap"><button class="btn2" id="wsb">Connect COROS</button><button class="btn2 hide" id="wsd">Disconnect</button><span class="mut" id="wsy" style="font-size:12px"></span></div>
   <div id="wcf" class="hide card"><div style="font-weight:700;margin-bottom:4px">Connect your COROS account</div><div class="mut" style="font-size:12px;margin-bottom:8px" id="wch2">Use the email and password you sign in to COROS with (not Google/Apple). Your password is sent once to log in and isn’t stored; only a login token is kept, so you’ll need to reconnect when it expires.</div><input class="in" id="wcm" type="email" placeholder="COROS email" autocomplete="off"><input class="in" id="wcp" type="password" placeholder="COROS password" autocomplete="off" style="margin-top:6px"><select class="in" id="wcr" style="margin-top:6px"><option value="en">Americas / Asia-Pacific</option><option value="eu">Europe</option><option value="cn">China</option></select><div id="wce" class="mut" style="min-height:20px;margin-top:6px;color:var(--er,#b3261e)"></div><div style="display:flex;gap:8px"><button class="btn2" id="wcs">Connect</button><button class="btn2" id="wcx">Cancel</button></div></div>
   <div id="wfm" class="hide card"><div class="g2"><select class="in" id="w_t"><option>Run</option><option>Walk</option><option>Cycle</option><option>Swim</option><option>Hike</option><option>Strength</option><option>Other</option></select><input class="in" id="w_d" type="date"></div><input class="in" id="w_n" placeholder="Title (optional)" style="margin-top:6px"><div class="g2"><div><label class="mut" id="w_ml" style="font-size:12px">Distance (km)</label><input class="in" id="w_m" type="number" inputmode="decimal"></div><div><label class="mut" style="font-size:12px">Minutes</label><input class="in" id="w_s" type="number" inputmode="decimal"></div></div><div class="g2"><div><label class="mut" style="font-size:12px">Calories (blank = estimate)</label><input class="in" id="w_k" type="number" inputmode="numeric"></div><div><label class="mut" style="font-size:12px">Avg heart rate</label><input class="in" id="w_h" type="number" inputmode="numeric"></div></div><button class="btn" id="w_sv" style="margin:10px 0 0">Save workout</button></div>
-  <div style="margin:0 12px 10px"><button class="btn2" id="wun"></button></div><div class="card" id="wst"></div><div class="card" id="wmi"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
-  <div class="hd" style="display:flex;align-items:center;justify-content:space-between;position:relative">History<button class="ib" id="wmore" aria-label="More options" style="font-size:22px;color:var(--mut)">⋯</button><div id="wmenu" class="hide"><label>Import file<input id="wfi" type="file" multiple accept=".csv,.tcx,.gpx,.fit,.txt" class="hide"></label><button id="wadd">Add workout</button></div></div><div id="wlist"></div>
+  <div class="card" id="wst"></div><div class="card" id="wmi"></div><div class="card" id="wch"></div><div class="card" id="wty"></div><div class="card" id="wpr"></div>
+  <div class="hd" style="display:flex;align-items:center;justify-content:space-between;position:relative">History<button class="ib" id="wmore" aria-label="More options" style="font-size:22px;color:var(--mut)">⋯</button><div id="wmenu" class="hide"><label>Import file<input id="wfi" type="file" multiple accept=".csv,.tcx,.gpx,.fit,.txt" class="hide"></label><button id="wadd">Add workout</button><button id="wun"></button></div></div><div id="wlist"></div>
 </main>
 <div class="sheet hide" id="pf">
   <header><button class="ib" id="pfb" aria-label="Back"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><h1>Your plan</h1></header>
@@ -529,11 +529,14 @@ function audioUnlock(){
 }
 const audioWait=()=>ac&&ac.state!=='running'?Promise.race([ac.resume().catch(()=>{}),new Promise(r=>setTimeout(r,400))]):Promise.resolve();
 function stopBeeps(){oscs.forEach(o=>{try{o.stop();}catch(e){}});oscs=[];speechT.forEach(clearTimeout);speechT=[];}
-['click','touchend'].forEach(ev=>addEventListener(ev,()=>{if(!ac||ac.state!=='running')audioUnlock();},{passive:true}));
+// Release the audio session as soon as nothing is playing, so the phone stops showing 'playing audio'
+function audioRelease(){try{if(sil)sil.pause();}catch(e){}try{if(navigator.audioSession)navigator.audioSession.type='auto';}catch(e){}try{if(ac&&ac.state==='running')ac.suspend();}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='idle')audioRelease();});
 const beep=(t,f,d)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;g.gain.value=.8;o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+d);oscs.push(o);};
 const sayAt=(txt,at)=>{if(!window.speechSynthesis)return;speechT.push(setTimeout(()=>{try{const u=new SpeechSynthesisUtterance(txt);u.rate=.95;speechSynthesis.speak(u);}catch(e){}},Math.max(0,(at-ctx.currentTime)*1000)));};
 async function begin(){
   if(cfg.mode==='finish')return;
+  if(+cfg.cd>0||cfg.sm!=='manual')audioUnlock(); // inside the tap, so iOS allows sound later
   if(cfg.sm==='auto')return armAuto();
   if(cfg.sm==='set')return beginSet();
   const n=+cfg.cd;
@@ -554,7 +557,7 @@ function endRun(broadcast,fin){
   if(state==='idle')return;
   const e=fin!=null?fin:(clock()-goA)/1000;
   if(broadcast&&room)room.emit('stop',{});
-  state='idle';clearTimeout(rtTimer);stopBeeps();
+  state='idle';clearTimeout(rtTimer);stopBeeps();if(!cfg.rep&&!plan.on)audioRelease();
   if(splits.length){runs.unshift({at:Date.now(),dist:planDist(),rep:!!(cfg.rep||plan.on),splits:splits.map(s=>({t:s.t,d:s.d,a:names()[s.a]||'',dev:s.dev,rt:s.rt}))});runs=runs.slice(0,30);ls.s('runs',runs);}
   $('tm').textContent=ft(Math.max(0,e));$('tl').textContent='Timer';render();
 }
@@ -1116,7 +1119,7 @@ const DU=()=>(cfg.du||(P&&P.u==='i'?'mi':'km'))==='mi'?[1609.344,'mi']:[1000,'km
 let MT='All',LT='',LD='';
 function wrender(){
   const du=DU(),fd=m=>r1(m/du[0])+' '+du[1],fh=s=>{const h=Math.floor(s/3600),m=Math.round(s%3600/60);return h?h+'h '+m+'m':m+'m';},pc=(s,m)=>{const p=Math.round(s/(m/du[0]));return Math.floor(p/60)+':'+String(p%60).padStart(2,'0')+' /'+du[1];},S=k=>WO.reduce((a,w)=>a+w[k],0);
-  $('w_ml').textContent='Distance ('+du[1]+')';$('wun').textContent='Distance units: '+du[1]+' (tap to switch)';
+  $('w_ml').textContent='Distance ('+du[1]+')';$('wun').textContent='Show in '+(du[1]==='mi'?'km':'mi');
   $('wst').innerHTML='<b>All time</b><div class="g2" style="margin-top:8px">'+[[WO.length,'Workouts'],[fd(S('m')),'Distance'],[fh(S('s')),'Time'],[Math.round(S('k')).toLocaleString(),'kcal burned']].map(x=>'<div><div style="font-size:24px;font-weight:700">'+x[0]+'</div><div class="mut">'+x[1]+'</div></div>').join('')+'</div>';
   $('wty').innerHTML='<b>By activity</b>'+(Object.keys(IW).map(t=>{const a=WO.filter(w=>w.t===t);if(!a.length)return '';const m=a.reduce((s,w)=>s+w.m,0),s=a.reduce((x,w)=>x+w.s,0);return '<div style="display:flex;justify-content:space-between;padding:7px 0"><span>'+IW[t]+' '+t+' · '+a.length+'</span><span class="mut">'+(m?fd(m)+' · ':'')+fh(s)+(m&&/Run|Walk|Hike/.test(t)?' · '+pc(s,m):'')+'</span></div>';}).join('')||'<div class="mut" style="margin-top:6px">Nothing yet. Import a Garmin or Coros export, or add a workout.</div>');
   const cw=new Date();cw.setDate(cw.getDate()-((cw.getDay()+6)%7));const bars=[];for(let i=7;i>=0;i--){const a=new Date(cw.getFullYear(),cw.getMonth(),cw.getDate()-i*7),b=new Date(a.getFullYear(),a.getMonth(),a.getDate()+7),ka=dk(a),kb=dk(b);bars.push([a,WO.filter(w=>w.d>=ka&&w.d<kb).reduce((s,w)=>s+w.k,0)]);}
@@ -1208,7 +1211,7 @@ $('wcs').onclick=async()=>{const e=$('wce'),b=$('wcs');e.textContent='';b.disabl
   b.disabled=false;b.textContent='Connect';};
 $('wsd').onclick=async()=>{if(!confirm('Disconnect COROS? Workouts already imported will stay.'))return;
   try{await window.fn('coros-sync',{action:'unlink'});CL={linked:false};corosUi();toast('COROS disconnected');}catch(x){toast(x.message||'Couldn’t disconnect.');}};
-$('wun').onclick=()=>{cfg.du=DU()[1]==='mi'?'km':'mi';ls.s('cfg',cfg);wrender();};
+$('wun').onclick=()=>{$('wmenu').classList.add('hide');cfg.du=DU()[1]==='mi'?'km':'mi';ls.s('cfg',cfg);wrender();};
 loadCoros();
 window.fn('coros-sync',{action:'status'}).then(r=>{CL=r;corosUi();if(r.linked&&(!r.lastSync||Date.now()-Date.parse(r.lastSync)>3*36e5))corosSync(true);}).catch(()=>{});
 
