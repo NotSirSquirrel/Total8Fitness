@@ -1,4 +1,4 @@
-const V='tw-shell-v1',CDN='tw-cdn';
+const V='tw-shell-v2',CDN='tw-cdn';
 const HOSTS=/^(cdn\.jsdelivr\.net|tessdata\.projectnaptha\.com|fonts\.googleapis\.com|fonts\.gstatic\.com)$/;
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(['./','index.html','manifest.webmanifest'])).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V&&x!==CDN).map(x=>caches.delete(x)))).then(()=>self.clients.claim()));});
